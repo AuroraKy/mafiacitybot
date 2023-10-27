@@ -5,8 +5,8 @@ namespace mafiacitybot;
 
 public class Settings
 {
-    public string Token;
-    public ulong GuildID;
+    public string Token { get; set; }
+    public ulong GuildID { get; set; }
 
     public Settings(string token, ulong guildid)
     {

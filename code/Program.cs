@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using System.Text.Json;
 using mafiacitybot.GuildCommands;
+using System.Reflection;
 
 namespace mafiacitybot;
 
@@ -16,7 +17,15 @@ public class Program
     public async Task MainAsync()
     {
         client = new DiscordSocketClient();
-        settings = JsonSerializer.Deserialize<Settings>(File.ReadAllText("settings.json"));
+        try
+        {
+            string text = File.ReadAllText("../../../Data/settings.json");
+            settings = JsonSerializer.Deserialize<Settings>(text);
+        } catch (ArgumentNullException ex)
+        {
+            Console.WriteLine("Failed to read settings.json");
+            return;
+        }
         Task createHooks = CreateHooks();
 
         if (settings.Token == null)

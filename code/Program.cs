@@ -19,7 +19,7 @@ public class Program
         client = new DiscordSocketClient();
         try
         {
-            string text = File.ReadAllText("../../../Data/settings.json");
+            string text = File.ReadAllText("../../../../Data/settings.json");
             settings = JsonSerializer.Deserialize<Settings>(text);
         } catch (ArgumentNullException ex)
         {
@@ -57,6 +57,7 @@ public class Program
     {
         var guild = client.GetGuild(settings.GuildID);
         await Ping.CreateCommand(guild);
+        await Phase.CreateCommand(guild);
     }
 
     

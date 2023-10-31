@@ -13,6 +13,15 @@ public static class SlashCommandHandler
             case "ping":
                 await Ping.HandleCommand(command);
                 break;
+            case "phase":
+                await Phase.HandleCommand(command);
+                break;
+            case "startgame":
+                await StartGame.HandleCommand(command);
+                break;
+            case "endgame":
+                await EndGame.HandleCommand(command);
+                break;
         }
     }
 }

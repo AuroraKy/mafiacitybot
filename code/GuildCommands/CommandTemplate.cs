@@ -4,13 +4,13 @@ using Discord.WebSocket;
 
 namespace mafiacitybot.GuildCommands;
 
-public static class Ping
+public static class CommandTemplate
 {
     public static async Task CreateCommand(SocketGuild guild)
     {
         var command = new SlashCommandBuilder();
-        command.WithName("ping");
-        command.WithDescription("pongs");
+        command.WithName("commandname");
+        command.WithDescription("Command Description.");
 
         try
         {
@@ -24,6 +24,6 @@ public static class Ping
 
     public static async Task HandleCommand(SocketSlashCommand command)
     {
-        await command.RespondAsync("pong");
+        await command.RespondAsync("Command output.");
     }
 }

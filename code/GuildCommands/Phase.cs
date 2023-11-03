@@ -22,8 +22,10 @@ public static class Phase
         }
     }
 
-    public static async Task HandleCommand(SocketSlashCommand command)
+    public static async Task HandleCommand(SocketSlashCommand command, Program program)
     {
-        await command.RespondAsync("Changed the phase! (not really lol)");
+        Guild guild = program.guilds[Convert.ToUInt64(command.GuildId)];
+        guild.AdvancePhase();
+        await command.RespondAsync($"Changed the phase! It is now {guild.CurrentPhase}.");
     }
 }

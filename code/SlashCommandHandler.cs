@@ -4,24 +4,39 @@ using System;
 
 namespace mafiacitybot;
 
-public static class SlashCommandHandler
+public class SlashCommandHandler
 {
-    public static async Task SlCommandHandler(SocketSlashCommand command)
+    public Program Program { get; set; }
+
+    public SlashCommandHandler(Program program)
     {
-        switch (command.Data.Name)
+        Program = program;
+    }
+
+    public async Task SlCommandHandler(SocketSlashCommand command)
+    {
+        if (!command.IsDMInteraction)
         {
-            case "ping":
-                await Ping.HandleCommand(command);
-                break;
-            case "phase":
-                await Phase.HandleCommand(command);
-                break;
-            case "startgame":
-                await StartGame.HandleCommand(command);
-                break;
-            case "endgame":
-                await EndGame.HandleCommand(command);
-                break;
+            switch (command.Data.Name)
+            {
+                case "ping":
+                    await Ping.HandleCommand(command);
+                    break;
+                case "phase":
+                    await Phase.HandleCommand(command, Program);
+                    break;
+                case "setup":
+                    await Setup.HandleCommand(command, Program);
+                    break;
+                case "endgame":
+                    await EndGame.HandleCommand(command);
+                    break;
+            }
         }
+        else
+        {
+            await command.RespondAsync("Sorry, but you need to run this command inside a server!");
+        }
+        
     }
 }

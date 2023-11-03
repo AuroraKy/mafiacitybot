@@ -9,23 +9,31 @@ namespace mafiacitybot;
 
 public class Program
 {
-    public DiscordSocketClient client;
+    public DiscordSocketClient client = new DiscordSocketClient();
     public Settings settings;
+    public Dictionary<ulong, Guild> guilds = new Dictionary<ulong, Guild>();
+    public SlashCommandHandler slashCommandHandler;
+
+    public Program()
+    {
+        try
+        {
+            string text = File.ReadAllText("../../../../Data/settings.json");
+            settings = JsonSerializer.Deserialize<Settings>(text);
+        }
+        catch (ArgumentNullException ex)
+        {
+            Console.WriteLine("Failed to read settings.json");
+            return;
+        }
+        slashCommandHandler = new SlashCommandHandler(this);
+    }
 
     public static Task Main(string[] args) => new Program().MainAsync();
 
     public async Task MainAsync()
     {
-        client = new DiscordSocketClient();
-        try
-        {
-            string text = File.ReadAllText("../../../../Data/settings.json");
-            settings = JsonSerializer.Deserialize<Settings>(text);
-        } catch (ArgumentNullException ex)
-        {
-            Console.WriteLine("Failed to read settings.json");
-            return;
-        }
+        
         Task createHooks = CreateHooks();
 
         if (settings.Token == null)
@@ -44,7 +52,7 @@ public class Program
     {
         client.Log += LogAsync;
         client.Ready += Client_Ready;
-        client.SlashCommandExecuted += SlashCommandHandler.SlCommandHandler;
+        client.SlashCommandExecuted += slashCommandHandler.SlCommandHandler;
     }
 
     public async Task Client_Ready()
@@ -58,9 +66,13 @@ public class Program
         var guild = client.GetGuild(settings.GuildID);
         await Ping.CreateCommand(guild);
         await Phase.CreateCommand(guild);
+        await Setup.CreateCommand(guild);
     }
 
-    
+    public async Task AddGuild(Guild guild)
+    {
+        guilds.Add(guild.GuildID, guild);
+    }
 
     public async Task LogAsync(LogMessage message)
     {
@@ -77,4 +89,9 @@ public class Program
 
         return;
     }
+}
+
+public class Bot
+{
+
 }

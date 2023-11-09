@@ -67,6 +67,7 @@ public class Program
         await Ping.CreateCommand(guild);
         await Phase.CreateCommand(guild);
         await Setup.CreateCommand(guild);
+        await Register.CreateCommand(guild);
     }
 
     public async Task AddGuild(Guild guild)
@@ -89,9 +90,4 @@ public class Program
 
         return;
     }
-}
-
-public class Bot
-{
-
 }

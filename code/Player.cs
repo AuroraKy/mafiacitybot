@@ -16,5 +16,4 @@ public class Player
         Name = name;
         Alive = true;
     }
-
 }

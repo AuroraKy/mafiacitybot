@@ -10,7 +10,7 @@ public static class Phase
     {
         var command = new SlashCommandBuilder();
         command.WithName("phase");
-        command.WithDescription("Changes the phase from day to night or vice versa.");
+        command.WithDescription("Changes the phase from day to night (or vice versa).");
 
         try
         {

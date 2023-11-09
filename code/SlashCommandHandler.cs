@@ -31,6 +31,9 @@ public class SlashCommandHandler
                 case "endgame":
                     await EndGame.HandleCommand(command);
                     break;
+                case "register":
+                    await Register.HandleCommand(command, Program);
+                    break;
             }
         }
         else

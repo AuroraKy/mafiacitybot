@@ -11,8 +11,8 @@ namespace mafiacitybot.GuildCommands
             var command = new SlashCommandBuilder();
             command.WithName("setup");
             command.WithDescription("Command Description.");
-            command.AddOption("hostrole", ApplicationCommandOptionType.Role, "change this later");
-            command.AddOption("hostchannel", ApplicationCommandOptionType.Channel, "change this later");
+            command.AddOption("hostrole", ApplicationCommandOptionType.Role, "change this later", isRequired : true);
+            command.AddOption("hostchannel", ApplicationCommandOptionType.Channel, "change this later", isRequired: true);
 
             try
             {

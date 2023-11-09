@@ -24,7 +24,25 @@ public static class Phase
 
     public static async Task HandleCommand(SocketSlashCommand command, Program program)
     {
-        Guild guild = program.guilds[Convert.ToUInt64(command.GuildId)];
+        if(command.GuildId == null || command.Channel == null)
+        {
+            await command.RespondAsync($"This command must be used in a guild.");
+            return;
+        }
+
+        if(!program.guilds.TryGetValue(Convert.ToUInt64(command.GuildId), out Guild guild))
+        {
+            await command.RespondAsync($"You must use setup before being able to use this command!");
+            return;
+        }
+
+        if(!Guild.IsHostRoleUser(command, guild.HostRoleID))
+        {
+
+            await command.RespondAsync($"You must have the host role to use this command!");
+            return;
+        }
+
         guild.AdvancePhase();
         await command.RespondAsync($"Changed the phase! It is now {guild.CurrentPhase}.");
     }

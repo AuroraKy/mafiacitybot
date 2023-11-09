@@ -33,7 +33,7 @@ namespace mafiacitybot.GuildCommands
                 {
                     guild.HostRoleID = ((SocketRole)command.Data.Options.ElementAt(0).Value).Id;
                     guild.HostChannelID = ((SocketGuildChannel)command.Data.Options.ElementAt(1).Value).Id;
-                    await command.RespondAsync("Guild setup has been modified.");
+                    await command.RespondAsync($"Guild setup has been modified.");
                 }
                 else
                 {
@@ -47,8 +47,6 @@ namespace mafiacitybot.GuildCommands
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
-            
-            
             
         }
     }

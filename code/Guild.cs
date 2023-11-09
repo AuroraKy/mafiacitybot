@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Discord.WebSocket;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace mafiacitybot;
@@ -55,6 +56,15 @@ public class Guild
     public void AdvancePhase()
     {
         CurrentPhase = (CurrentPhase == Phase.Day) ? Phase.Night : Phase.Day;
+    }
+
+    public static bool IsHostRoleUser(SocketSlashCommand command, ulong roleID)
+    {
+        if (command.Channel == null || command.User == null) return false;
+
+        SocketGuildUser user = (SocketGuildUser)command.User;
+        SocketGuild Guild = (command.Channel as SocketGuildChannel).Guild;
+        return user.Roles.Contains<SocketRole>(Guild.GetRole(roleID));
     }
 
 }

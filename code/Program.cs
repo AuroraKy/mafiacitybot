@@ -21,7 +21,7 @@ public class Program
             string text = File.ReadAllText("../../../../Data/settings.json");
             settings = JsonSerializer.Deserialize<Settings>(text);
         }
-        catch (ArgumentNullException ex)
+        catch (Exception ex)
         {
             Console.WriteLine("Failed to read settings.json");
             return;

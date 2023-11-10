@@ -24,12 +24,6 @@ public static class Phase
 
     public static async Task HandleCommand(SocketSlashCommand command, Program program)
     {
-        if(command.GuildId == null || command.Channel == null)
-        {
-            await command.RespondAsync($"This command must be used in a guild.");
-            return;
-        }
-
         if(!program.guilds.TryGetValue(Convert.ToUInt64(command.GuildId), out Guild guild))
         {
             await command.RespondAsync($"You must use setup before being able to use this command!");

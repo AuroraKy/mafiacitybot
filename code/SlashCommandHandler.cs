@@ -34,6 +34,9 @@ public class SlashCommandHandler
                 case "register":
                     await Register.HandleCommand(command, Program);
                     break;
+                case "letter":
+                    await Letter.HandleCommand(command, Program);
+                    break;
             }
         }
         else

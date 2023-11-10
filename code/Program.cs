@@ -74,6 +74,7 @@ public class Program
         await Phase.CreateCommand(guild);
         await Setup.CreateCommand(guild);
         await Register.CreateCommand(guild);
+        await Letter.CreateCommand(guild);
     }
 
     public async Task AddGuild(Guild guild)

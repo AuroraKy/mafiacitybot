@@ -1,6 +1,7 @@
 ﻿using Discord.WebSocket;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace mafiacitybot;
 
@@ -33,6 +34,7 @@ public class Guild
 
     public Phase CurrentPhase { get; set; }
 
+
     public Guild(ulong guildID, ulong hostRoleID, ulong hostChannelID)
     {
         GuildID = guildID;
@@ -47,15 +49,40 @@ public class Guild
         CurrentPhase = startingPhase;
     }
 
-    public void Save(ulong id)
+    [JsonConstructor]
+    public Guild(ulong GuildID, ulong HostRoleID, ulong HostChannelID, List<Player> Players, Phase CurrentPhase) : this(GuildID, HostRoleID, HostChannelID)
+    {
+        this.CurrentPhase = CurrentPhase;
+        this.Players = Players;
+    }
+
+    public void Save()
     {
         string json = JsonSerializer.Serialize(this);
-        File.WriteAllText($"../../../../Data/Guild_{id}.json", json);
+        File.WriteAllText($"../../../../Data/Guild_{GuildID}.json", json);
+    }
+
+    public static Guild? Load(ulong id)
+    {
+        if (!File.Exists($"../../../../Data/Guild_{id}.json")) return null;
+        string json = File.ReadAllText($"../../../../Data/Guild_{id}.json");
+        return JsonSerializer.Deserialize<Guild>(json);
     }
 
     public void AdvancePhase()
     {
         CurrentPhase = (CurrentPhase == Phase.Day) ? Phase.Night : Phase.Day;
+        Save();
+    }
+
+    public void AddPlayer(Player player)
+    {
+        if(Players.Contains(player))
+        {
+            Players.Remove(player);
+        }
+        Players.Add(player);
+        Save();
     }
 
     public static bool IsHostRoleUser(SocketSlashCommand command, ulong roleID)

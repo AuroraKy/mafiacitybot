@@ -64,6 +64,10 @@ public class Program
     public async Task LoadGuildCommands()
     {
         var guild = client.GetGuild(settings.GuildID);
+
+        Guild? g = Guild.Load(guild.Id);
+        if (g != null) await AddGuild(g);
+
         await Ping.CreateCommand(guild);
         await Phase.CreateCommand(guild);
         await Setup.CreateCommand(guild);

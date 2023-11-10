@@ -28,17 +28,19 @@ namespace mafiacitybot.GuildCommands
         {
             try
             {
-                Guild guild;
-                if (program.guilds.TryGetValue(Convert.ToUInt64(command.GuildId), out guild))
+                
+                if (program.guilds.TryGetValue(Convert.ToUInt64(command.GuildId), out Guild guild))
                 {
                     guild.HostRoleID = ((SocketRole)command.Data.Options.ElementAt(0).Value).Id;
                     guild.HostChannelID = ((SocketGuildChannel)command.Data.Options.ElementAt(1).Value).Id;
+                    guild.Save();
                     await command.RespondAsync($"Guild setup has been modified.");
                 }
                 else
                 {
                     guild = new Guild(Convert.ToUInt64(command.GuildId), ((SocketRole)command.Data.Options.ElementAt(0).Value).Id, ((SocketGuildChannel)command.Data.Options.ElementAt(1).Value).Id);
                     await program.AddGuild(guild);
+                    guild.Save();
                     await command.RespondAsync("Guild setup has been stored.");
                 }
             }

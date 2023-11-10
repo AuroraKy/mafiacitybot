@@ -30,12 +30,15 @@ namespace mafiacitybot.GuildCommands
         {
             try
             {
-                Guild guild;
-                program.guilds.TryGetValue(Convert.ToUInt64(command.GuildId), out guild);
+                if(!program.guilds.TryGetValue(Convert.ToUInt64(command.GuildId), out Guild guild))
+                {
+                    await command.RespondAsync("You must use Setup first!");
+                    return;
+                }
                 ulong userID = ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id;
                 ulong channelID = ((SocketGuildChannel)command.Data.Options.ElementAt(2).Value).Id;
                 string name = (string)command.Data.Options.ElementAt(1).Value;
-                guild.Players.Add(new Player
+                guild.AddPlayer(new Player
                 (userID, channelID, name));
                 await command.RespondAsync($"Registered new player {program.client.GetUserAsync(userID)} with channel {program.client.GetChannelAsync(channelID)}.");
             }

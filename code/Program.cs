@@ -23,7 +23,9 @@ public class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Failed to read settings.json");
+            Console.WriteLine("Failed to read settings.json: " + ex.Message);
+            Console.WriteLine(ex.StackTrace);
+            Environment.Exit(1);
             return;
         }
         slashCommandHandler = new SlashCommandHandler(this);

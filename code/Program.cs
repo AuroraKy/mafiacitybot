@@ -13,9 +13,11 @@ public class Program
     public Settings settings;
     public Dictionary<ulong, Guild> guilds = new Dictionary<ulong, Guild>();
     public SlashCommandHandler slashCommandHandler;
+    public static Program instance;
 
     public Program()
     {
+        instance = this;
         try
         {
             string text = File.ReadAllText("../../../../Data/settings.json");
@@ -75,6 +77,9 @@ public class Program
         await Setup.CreateCommand(guild);
         await Register.CreateCommand(guild);
         await Letter.CreateCommand(guild);
+        client.ModalSubmitted += Letter.ModalSubmitted;
+        await Actions.CreateCommand(guild);
+        client.ModalSubmitted += Actions.ModalSubmitted;
     }
 
     public async Task AddGuild(Guild guild)

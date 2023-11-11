@@ -80,6 +80,7 @@ public class Program
         client.ModalSubmitted += Letter.ModalSubmitted;
         await Actions.CreateCommand(guild);
         client.ModalSubmitted += Actions.ModalSubmitted;
+        await ClearPlayers.CreateCommand(guild);
     }
 
     public async Task AddGuild(Guild guild)

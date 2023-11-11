@@ -40,6 +40,9 @@ public class SlashCommandHandler
                 case "action":
                     await Actions.HandleCommand(command, Program);
                     break;
+                case "clear_players":
+                    await ClearPlayers.HandleCommand(command, Program);
+                    break;
             }
         }
         else

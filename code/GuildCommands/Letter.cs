@@ -84,7 +84,7 @@ namespace mafiacitybot.GuildCommands
                     {
                         if(options != null && options.Count > 0)
                         {
-                            Int64 letter = (Int64)options.First().Value - 1;
+                            long letter = (long)options.First().Value - 1;
                             if(letter < 0 || player.letters.Count < letter)
                             {
                                 await command.RespondAsync("Invalid letter number.\nValid letter numbers: " + new Range(0, player.letters.Count - 1));
@@ -171,6 +171,8 @@ namespace mafiacitybot.GuildCommands
 
         public static async Task ModalSubmitted(SocketModal modal)
         {
+            if (!modal.Data.CustomId.StartsWith("add_letter") && !modal.Data.CustomId.StartsWith("edit_letter")) return;
+
             var user = modal.User;
             var channel = modal.Channel;
 
@@ -196,7 +198,7 @@ namespace mafiacitybot.GuildCommands
                 ulong recipientId = Convert.ToUInt64(modal.Data.CustomId.Split("|")[1]);
 
                 player.letters.Add(new Player.Letter(recipientId, content));
-                await modal.RespondAsync($"Letter added! Letter #{player.letters.Count} to {Program.instance.client.GetUser(recipientId).Username}:\n`{content.Substring(0, Math.Min(content.Length, 130))}...`");
+                await modal.RespondAsync($"Letter added! Letter #{player.letters.Count} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:\n`{content.Substring(0, Math.Min(content.Length, 130))}...`");
             }
             else if(modal.Data.CustomId.StartsWith("edit_letter"))
             {
@@ -209,7 +211,7 @@ namespace mafiacitybot.GuildCommands
                 l.content = content;
                 player.letters.RemoveAt((int)letter);
                 player.letters.Insert((int)letter, l);
-                await modal.RespondAsync($"Letter changed! Letter #{letter + 1} to {Program.instance.client.GetUser(recipientId).Username}:\n`{content.Substring(0, Math.Min(content.Length, 130))}...`");
+                await modal.RespondAsync($"Letter changed! Letter #{letter + 1} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:\n`{content.Substring(0, Math.Min(content.Length, 130))}...`");
             }
             guild.Save();
         }

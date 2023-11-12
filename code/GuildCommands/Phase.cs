@@ -9,6 +9,7 @@ public static class Phase
     public static async Task CreateCommand(SocketGuild guild)
     {
         var command = new SlashCommandBuilder();
+        command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
         command.WithName("phase");
         command.WithDescription("Changes the phase from day to night (or vice versa).");
 

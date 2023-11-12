@@ -9,6 +9,7 @@ namespace mafiacitybot.GuildCommands
         public static async Task CreateCommand(SocketGuild guild)
         {
             var command = new SlashCommandBuilder();
+            command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
             command.WithName("setup");
             command.WithDescription("Command Description.");
             command.AddOption("hostrole", ApplicationCommandOptionType.Role, "change this later", isRequired : true);

@@ -59,13 +59,13 @@ public class Guild
     public void Save()
     {
         string json = JsonSerializer.Serialize(this);
-        File.WriteAllText($"../../../../Data/Guild_{GuildID}.json", json);
+        File.WriteAllText($"{Program.DataPath}/Guild_{GuildID}.json", json);
     }
 
     public static Guild? Load(ulong id)
     {
-        if (!File.Exists($"../../../../Data/Guild_{id}.json")) return null;
-        string json = File.ReadAllText($"../../../../Data/Guild_{id}.json");
+        if (!File.Exists($"{Program.DataPath}/Guild_{id}.json")) return null;
+        string json = File.ReadAllText($"{Program.DataPath}/Guild_{id}.json");
         return JsonSerializer.Deserialize<Guild>(json);
     }
 

@@ -10,6 +10,7 @@ namespace mafiacitybot.GuildCommands
         public static async Task CreateCommand(SocketGuild guild)
         {
             var command = new SlashCommandBuilder();
+            command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
             command.WithName("register");
             command.WithDescription("Registers a player and their personal channel.");
             command.AddOption("user", ApplicationCommandOptionType.User, "change this later", isRequired: true);

@@ -14,13 +14,15 @@ public class Program
     public Dictionary<ulong, Guild> guilds = new Dictionary<ulong, Guild>();
     public SlashCommandHandler slashCommandHandler;
     public static Program instance;
+    //public static string DataPath = "./Data"; // for raspberry pi
+    public static string DataPath = "../../../../Data"; // testing
 
     public Program()
     {
         instance = this;
         try
         {
-            string text = File.ReadAllText("../../../../Data/settings.json");
+            string text = File.ReadAllText(DataPath + "/settings.json");
             settings = JsonSerializer.Deserialize<Settings>(text);
         }
         catch (Exception ex)
@@ -67,20 +69,22 @@ public class Program
 
     public async Task LoadGuildCommands()
     {
-        var guild = client.GetGuild(settings.GuildID);
+        foreach(SocketGuild guild in client.Guilds)
+        {
+            Guild? g = Guild.Load(guild.Id);
+            if (g != null) await AddGuild(g);
 
-        Guild? g = Guild.Load(guild.Id);
-        if (g != null) await AddGuild(g);
+            await Ping.CreateCommand(guild);
+            await Phase.CreateCommand(guild);
+            await Setup.CreateCommand(guild);
+            await Register.CreateCommand(guild);
+            await Letter.CreateCommand(guild);
+            await Actions.CreateCommand(guild);
+            await ClearPlayers.CreateCommand(guild);
+        }
 
-        await Ping.CreateCommand(guild);
-        await Phase.CreateCommand(guild);
-        await Setup.CreateCommand(guild);
-        await Register.CreateCommand(guild);
-        await Letter.CreateCommand(guild);
         client.ModalSubmitted += Letter.ModalSubmitted;
-        await Actions.CreateCommand(guild);
         client.ModalSubmitted += Actions.ModalSubmitted;
-        await ClearPlayers.CreateCommand(guild);
     }
 
     public async Task AddGuild(Guild guild)

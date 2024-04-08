@@ -43,6 +43,12 @@ public class SlashCommandHandler
                 case "clear_players":
                     await ClearPlayers.HandleCommand(command, Program);
                     break;
+                case "clear_player":
+                    await ClearPlayer.HandleCommand(command, Program);
+                    break;
+                case "info":
+                    await Info.HandleCommand(command, Program);
+                    break;
             }
         }
         else

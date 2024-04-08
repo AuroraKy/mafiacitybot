@@ -81,6 +81,8 @@ public class Program
             await Letter.CreateCommand(guild);
             await Actions.CreateCommand(guild);
             await ClearPlayers.CreateCommand(guild);
+            await ClearPlayer.CreateCommand(guild);
+            await Info.CreateCommand(guild);
         }
 
         client.ModalSubmitted += Letter.ModalSubmitted;

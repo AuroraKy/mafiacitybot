@@ -4,13 +4,13 @@ using Discord.WebSocket;
 
 namespace mafiacitybot.GuildCommands;
 
-public static class ClearPlayers
+public static class Info
 {
     public static async Task CreateCommand(SocketGuild guild)
     {
         var command = new SlashCommandBuilder();
-        command.WithName("clear_players");
-        command.WithDescription("(Host-Only) Clears all players.");
+        command.WithName("info");
+        command.WithDescription("Provides information about the current game.");
 
         try
         {
@@ -29,14 +29,7 @@ public static class ClearPlayers
             await command.RespondAsync($"You must use setup before being able to use this command!");
             return;
         }
-        if (!Guild.IsHostRoleUser(command, guild.HostRoleID))
-        {
-            await command.RespondAsync($"You must have the host role to use this command!");
-            return;
-        }
 
-        guild.Players = new();
-        await command.RespondAsync("Cleared all players!");
-        guild.Save();
+        await command.RespondAsync($"Phase: {guild.CurrentPhase}\nPlayer amount: {guild.Players.Count}\nPlayers: {String.Join(", ", guild.Players.Select(pl => pl.Name))}");
     }
 }

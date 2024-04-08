@@ -4,13 +4,14 @@ using Discord.WebSocket;
 
 namespace mafiacitybot.GuildCommands;
 
-public static class ClearPlayers
+public static class ClearPlayer
 {
     public static async Task CreateCommand(SocketGuild guild)
     {
         var command = new SlashCommandBuilder();
-        command.WithName("clear_players");
-        command.WithDescription("(Host-Only) Clears all players.");
+        command.WithName("clear_player");
+        command.WithDescription("(Host-Only) Clears a player.");
+        command.AddOption("player", ApplicationCommandOptionType.User, "The player you want to remove", isRequired: true);
 
         try
         {
@@ -34,9 +35,18 @@ public static class ClearPlayers
             await command.RespondAsync($"You must have the host role to use this command!");
             return;
         }
+        SocketGuildUser user = (SocketGuildUser)command.Data.Options.ElementAt(0).Value;
+        ulong userID = (user).Id;
+        Player? player = guild.Players.Find(player => player.PlayerID == userID);
+        if(player != null)
+        {
+            guild.Players.Remove(player);
+            await command.RespondAsync($"Removed {player.Name} (<@{player.PlayerID}> <#{player.ChannelID}>) from players");
+            guild.Save();
+        } else
+        {
+            await command.RespondAsync($"Player {user.DisplayName} not found as a registered user.");
+        }
 
-        guild.Players = new();
-        await command.RespondAsync("Cleared all players!");
-        guild.Save();
     }
 }

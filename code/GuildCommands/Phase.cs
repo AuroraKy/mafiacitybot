@@ -71,7 +71,7 @@ public static class Phase
             }
 
             // seperate every letter/action
-            List<Embed> toSend = new List<Embed>
+            List<Embed> toSend = new()
             {
                 embed.Build()
             };
@@ -80,7 +80,8 @@ public static class Phase
             {
                 toSend.Add(letter.Build());
             }
-            toSend.Last().ToEmbedBuilder().WithCurrentTimestamp().Build();
+            // this doesn't work idk why.
+            toSend.Last().ToEmbedBuilder().WithTimestamp(DateTimeOffset.UtcNow).Build();
 
             queue.Add(toSend);
         }

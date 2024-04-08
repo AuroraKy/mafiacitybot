@@ -48,12 +48,12 @@ public static class Phase
         string answer = "";
         foreach (Player player in guild.Players)
         {
-            answer += "-- Player: " + player.Name + " -- \n";
-            answer += "- "+(guild.CurrentPhase == Guild.Phase.Day ? "Day" : "Night") + " Action:\n";
+            answer += "# Player: " + player.Name + "\n";
+            answer += "## "+(guild.CurrentPhase == Guild.Phase.Day ? "Day" : "Night") + " Action:\n";
             answer += $"{player.Action}\n\n";
             if(guild.CurrentPhase == Guild.Phase.Day)
             {
-                answer += $"- Letters:\n";
+                answer += $"## Letters:\n";
                 int count = 1;
                 foreach (Player.Letter letter in player.letters)
                 {
@@ -61,7 +61,6 @@ public static class Phase
                     count++;
                 }
             }
-            answer += "-- End of player " + player.Name + " --\n";
         }
 
         for(int i = 0; i < Math.Ceiling(answer.Length/2000f); i++)
@@ -77,6 +76,6 @@ public static class Phase
         }
         guild.AdvancePhase();
 
-        await channel.SendMessageAsync("---- Done! ----\n It is now "+guild.CurrentPhase+".");
+        await channel.SendMessageAsync("### Done!\n It is now "+guild.CurrentPhase+".");
     }
 }

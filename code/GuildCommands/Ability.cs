@@ -104,6 +104,7 @@ namespace mafiacitybot.GuildCommands
             // Respond to the modal.
             await modal.RespondAsync("Set action:\n" + content.Substring(0, Math.Min(content.Length, 130)) + (content.Length < 130 ? "" : "..."));
 
+            guild.Save();
         }
     }
 }

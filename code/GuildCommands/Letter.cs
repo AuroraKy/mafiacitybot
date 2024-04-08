@@ -56,9 +56,9 @@ namespace mafiacitybot.GuildCommands
                 return;
             }
 
-            if(guild.CurrentPhase != Guild.Phase.Day)
+            if(guild.CurrentPhase != Guild.Phase.Night)
             {
-                await command.RespondAsync($"Letter commands can only be used during the day!");
+                await command.RespondAsync($"Letter commands can only be used during the night!");
                 return;
             }
 

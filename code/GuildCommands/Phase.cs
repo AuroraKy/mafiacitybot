@@ -42,31 +42,55 @@ public static class Phase
             return;
         }
 
-        await command.RespondAsync($"Changing to {(guild.CurrentPhase == Guild.Phase.Day ? "Night" : "Day")}.\n------------- DATA -------------");
+        await command.RespondAsync($"Changing to {(guild.CurrentPhase == Guild.Phase.Day ? "Night" : "Day")}.");
 
         var channel = command.Channel;
-        string answer = "";
+        List<List<Embed>> queue = new List<List<Embed>>();
         foreach (Player player in guild.Players)
         {
-            answer += "# Player: " + player.Name + "\n";
-            answer += "## "+(guild.CurrentPhase == Guild.Phase.Day ? "Day" : "Night") + " Action:\n";
-            answer += $"{player.Action}\n\n";
-            if(guild.CurrentPhase == Guild.Phase.Day)
+            Color embedColor = new((int)(player.PlayerID % 256), (int)(player.PlayerID / 1000 % 256), (int)(player.PlayerID / 1e6 % 256));
+            EmbedBuilder embed = new EmbedBuilder()
+                        .WithAuthor(program.client.GetUser(player.PlayerID))
+                        .WithColor(embedColor)
+                        .WithTitle($"{(guild.CurrentPhase == Guild.Phase.Day ? "Day" : "Night")} Action")
+                        .WithDescription((player.Action.Length == 0 ? "None" : player.Action));
+
+
+            List<EmbedBuilder> letters = new List<EmbedBuilder>();
+            if(player.letters.Count > 0)
             {
-                answer += $"## Letters:\n";
                 int count = 1;
                 foreach (Player.Letter letter in player.letters)
                 {
-                    answer += $"Letter #{count} to {program.client.GetUser(letter.recipientID)?.Username ?? "<@"+letter.recipientID+">"}:\n{letter.content}\n\n";
+                    letters.Add(new EmbedBuilder()
+                        .WithTitle($"Letter #{count} to {program.client.GetUser(letter.recipientID)?.Username ?? "<@" + letter.recipientID + ">"}")
+                        .WithDescription(letter.content)
+                        .WithColor(embedColor));
                     count++;
                 }
             }
+
+            // seperate every letter/action
+            List<Embed> toSend = new List<Embed>
+            {
+                embed.Build()
+            };
+
+            foreach (EmbedBuilder letter in letters)
+            {
+                toSend.Add(letter.Build());
+            }
+            toSend.Last().ToEmbedBuilder().WithCurrentTimestamp().Build();
+
+            queue.Add(toSend);
         }
 
-        for(int i = 0; i < Math.Ceiling(answer.Length/2000f); i++)
-        {
-            await channel.SendMessageAsync(String.Concat("", answer.AsSpan(i * 2000, Math.Min(answer.Length-(i*2000), 2000))));
-            await Task.Delay(1500);
+        foreach(List<Embed> messages in queue) {
+            foreach(Embed msg in messages)
+            {
+                await channel.SendMessageAsync(embed:msg);
+                await Task.Delay(1500);
+            }
         }
 
         foreach (Player player in guild.Players)
@@ -76,6 +100,6 @@ public static class Phase
         }
         guild.AdvancePhase();
 
-        await channel.SendMessageAsync("### Done!\n It is now "+guild.CurrentPhase+".");
+        await channel.SendMessageAsync("It is now "+guild.CurrentPhase+".");
     }
 }

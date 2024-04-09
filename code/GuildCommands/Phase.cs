@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Net;
 using Discord.WebSocket;
+using System.Numerics;
 
 namespace mafiacitybot.GuildCommands;
 
@@ -12,6 +13,7 @@ public static class Phase
         command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
         command.WithName("phase");
         command.WithDescription("Changes the phase from day to night (or vice versa).");
+        command.AddOption("clear", ApplicationCommandOptionType.Boolean, "Wether it should clear actions and letters on phase change", isRequired: false);
 
         try
         {
@@ -49,8 +51,10 @@ public static class Phase
         foreach (Player player in guild.Players)
         {
             Color embedColor = new((int)(player.PlayerID % 256), (int)(player.PlayerID / 1000 % 256), (int)(player.PlayerID / 1e6 % 256));
+            IUser? user = await program.client.GetUserAsync(player.PlayerID);
+            if(user == null) continue;
             EmbedBuilder embed = new EmbedBuilder()
-                        .WithAuthor(program.client.GetUser(player.PlayerID))
+                        .WithAuthor(user)
                         .WithColor(embedColor)
                         .WithTitle($"{(guild.CurrentPhase == Guild.Phase.Day ? "Day" : "Night")} Action")
                         .WithDescription((player.Action.Length == 0 ? "None" : player.Action));
@@ -62,8 +66,9 @@ public static class Phase
                 int count = 1;
                 foreach (Player.Letter letter in player.letters)
                 {
+                    IUser? usertmp = program.client.GetUser(letter.recipientID);
                     letters.Add(new EmbedBuilder()
-                        .WithTitle($"Letter #{count} to {program.client.GetUser(letter.recipientID)?.Username ?? "<@" + letter.recipientID + ">"}")
+                        .WithTitle($"Letter #{count} to {usertmp?.Username ?? " <@" + letter.recipientID + ">"}")
                         .WithDescription(letter.content)
                         .WithColor(embedColor));
                     count++;
@@ -81,7 +86,7 @@ public static class Phase
                 toSend.Add(letter.Build());
             }
             // this doesn't work idk why.
-            toSend.Last().ToEmbedBuilder().WithTimestamp(DateTimeOffset.UtcNow).Build();
+            //toSend.Last().ToEmbedBuilder().WithTimestamp(DateTimeOffset.UtcNow).Build();
 
             queue.Add(toSend);
         }
@@ -90,14 +95,24 @@ public static class Phase
             foreach(Embed msg in messages)
             {
                 await channel.SendMessageAsync(embed:msg);
-                await Task.Delay(1500);
+                await Task.Delay(100);
             }
         }
 
-        foreach (Player player in guild.Players)
+        var options = command.Data.Options;
+        bool remove = true;
+        if (options.Count > 0)
         {
-            player.Action = "";
-            player.letters = new();
+            remove = (bool)options.First().Value;
+        }
+
+        if(remove)
+        {
+            foreach (Player player in guild.Players)
+            {
+                player.Action = "";
+                player.letters = new();
+            }
         }
         guild.AdvancePhase();
 

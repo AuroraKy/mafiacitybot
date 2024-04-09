@@ -20,34 +20,34 @@ public class SlashCommandHandler
             switch (command.Data.Name)
             {
                 case "ping":
-                    await Ping.HandleCommand(command);
+                    Ping.HandleCommand(command);
                     break;
                 case "phase":
-                    await Phase.HandleCommand(command, Program);
+                    Phase.HandleCommand(command, Program);
                     break;
                 case "setup":
-                    await Setup.HandleCommand(command, Program);
+                    Setup.HandleCommand(command, Program);
                     break;
                 case "endgame":
-                    await EndGame.HandleCommand(command);
+                    EndGame.HandleCommand(command);
                     break;
                 case "register":
-                    await Register.HandleCommand(command, Program);
+                    Register.HandleCommand(command, Program);
                     break;
                 case "letter":
-                    await Letter.HandleCommand(command, Program);
+                    Letter.HandleCommand(command, Program);
                     break;
                 case "action":
-                    await Actions.HandleCommand(command, Program);
+                    Actions.HandleCommand(command, Program);
                     break;
                 case "clear_players":
-                    await ClearPlayers.HandleCommand(command, Program);
+                    ClearPlayers.HandleCommand(command, Program);
                     break;
                 case "clear_player":
-                    await ClearPlayer.HandleCommand(command, Program);
+                    ClearPlayer.HandleCommand(command, Program);
                     break;
                 case "info":
-                    await Info.HandleCommand(command, Program);
+                    Info.HandleCommand(command, Program);
                     break;
             }
         }

@@ -9,7 +9,10 @@ namespace mafiacitybot;
 
 public class Program
 {
-    public DiscordSocketClient client = new DiscordSocketClient();
+    public DiscordSocketClient client = new DiscordSocketClient(new DiscordSocketConfig() {
+        AlwaysDownloadUsers = true,
+        GatewayIntents = GatewayIntents.GuildMembers
+    });
     public Settings settings;
     public Dictionary<ulong, Guild> guilds = new Dictionary<ulong, Guild>();
     public SlashCommandHandler slashCommandHandler;
@@ -83,6 +86,8 @@ public class Program
             await ClearPlayers.CreateCommand(guild);
             await ClearPlayer.CreateCommand(guild);
             await Info.CreateCommand(guild);
+            await EnforceRoles.CreateCommand(guild);
+
         }
 
         client.ModalSubmitted += Letter.ModalSubmitted;

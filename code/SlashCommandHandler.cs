@@ -49,6 +49,9 @@ public class SlashCommandHandler
                 case "info":
                     Info.HandleCommand(command, Program);
                     break;
+                case "enforce_roles":
+                    EnforceRoles.HandleCommand(command, Program);
+                    break;
             }
         }
         else

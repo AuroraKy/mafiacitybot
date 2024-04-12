@@ -11,7 +11,7 @@ public class Program
 {
     public DiscordSocketClient client = new DiscordSocketClient(new DiscordSocketConfig() {
         AlwaysDownloadUsers = true,
-        GatewayIntents = GatewayIntents.GuildMembers
+        GatewayIntents = GatewayIntents.GuildMembers | GatewayIntents.AllUnprivileged - GatewayIntents.GuildScheduledEvents - GatewayIntents.GuildInvites
     });
     public Settings settings;
     public Dictionary<ulong, Guild> guilds = new Dictionary<ulong, Guild>();
@@ -70,13 +70,10 @@ public class Program
         await guildCommandsTask;
     }
 
-    public async Task LoadGuildCommands()
+    public async Task CreateCommands()
     {
-        foreach(SocketGuild guild in client.Guilds)
+        foreach (SocketGuild guild in client.Guilds)
         {
-            Guild? g = Guild.Load(guild.Id);
-            if (g != null) await AddGuild(g);
-
             await Ping.CreateCommand(guild);
             await Phase.CreateCommand(guild);
             await Setup.CreateCommand(guild);
@@ -87,7 +84,20 @@ public class Program
             await ClearPlayer.CreateCommand(guild);
             await Info.CreateCommand(guild);
             await EnforceRoles.CreateCommand(guild);
+            await ViewActions.CreateCommand(guild);
+            if (guild.Id == 1167188182262095952u)
+            {
+                await RegisterCommands.CreateCommand(guild);
+            }
+        }
+    }
+    public async Task LoadGuildCommands()
+    {
 
+        foreach (SocketGuild guild in client.Guilds)
+        {
+            Guild? g = Guild.Load(guild.Id);
+            if (g != null) await AddGuild(g);
         }
 
         client.ModalSubmitted += Letter.ModalSubmitted;

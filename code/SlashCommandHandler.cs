@@ -17,40 +17,57 @@ public class SlashCommandHandler
     {
         if (!command.IsDMInteraction)
         {
+            Action<Task> OnFault = task =>
+            {
+                if (task.Exception?.InnerException is { } inner)
+                {
+                    Console.WriteLine("{0}: {1}\nAt {2}\n{3}",
+                        inner.GetType().Name,
+                        inner.Message,
+                        inner.TargetSite,
+                        inner.StackTrace);
+                }
+            };
             switch (command.Data.Name)
             {
                 case "ping":
-                    Ping.HandleCommand(command);
+                    _ = Ping.HandleCommand(command).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "phase":
-                    Phase.HandleCommand(command, Program);
+                    _ = Phase.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "setup":
-                    Setup.HandleCommand(command, Program);
+                    _ = Setup.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "endgame":
-                    EndGame.HandleCommand(command);
+                    _ = EndGame.HandleCommand(command).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "register":
-                    Register.HandleCommand(command, Program);
+                    _ = Register.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "letter":
-                    Letter.HandleCommand(command, Program);
+                    _ = Letter.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "action":
-                    Actions.HandleCommand(command, Program);
+                    _ = Actions.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "clear_players":
-                    ClearPlayers.HandleCommand(command, Program);
+                    _ = ClearPlayers.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);   
                     break;
                 case "clear_player":
-                    ClearPlayer.HandleCommand(command, Program);
+                    _ = ClearPlayer.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "info":
-                    Info.HandleCommand(command, Program);
+                    _ = Info.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "enforce_roles":
-                    EnforceRoles.HandleCommand(command, Program);
+                    _ = EnforceRoles.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "register_commands":
+                    _ = RegisterCommands.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "view_actions":
+                    _ = ViewActions.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
             }
         }

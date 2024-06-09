@@ -69,6 +69,12 @@ public class SlashCommandHandler
                 case "view_actions":
                     _ = ViewActions.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
+                case "view_action":
+                    _ = ViewAction.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "help":
+                    _ = Help.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
             }
         }
         else

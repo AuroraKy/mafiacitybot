@@ -48,6 +48,7 @@ public static class ViewActions
 
         var channel = command.Channel;
         List<List<Embed>> queue = new List<List<Embed>>();
+        List<Player> playersWithoutAction = new List<Player>();
         foreach (Player player in guild.Players)
         {
             Color embedColor = new((int)(player.PlayerID % 256), (int)(player.PlayerID / 1000 % 256), (int)(player.PlayerID / 1e6 % 256));
@@ -55,9 +56,9 @@ public static class ViewActions
             if(user == null) continue;
             EmbedBuilder embed = new EmbedBuilder()
                         .WithAuthor(user)
-                        .WithColor(embedColor)
+                        .WithColor(player.Action.Length == 0 ? Color.Red : embedColor)
                         .WithTitle($"{(guild.CurrentPhase == Guild.Phase.Day ? "Day" : "Night")} Action")
-                        .WithDescription((player.Action.Length == 0 ? "None" : player.Action));
+                        .WithDescription((player.Action.Length == 0 ? "N/A" : player.Action));
 
 
             List<EmbedBuilder> letters = new List<EmbedBuilder>();
@@ -68,6 +69,7 @@ public static class ViewActions
                 {
                     IUser? usertmp = program.client.GetUser(letter.recipientID);
                     letters.Add(new EmbedBuilder()
+                        .WithAuthor(user)
                         .WithTitle($"Letter #{count} to {usertmp?.Username ?? " <@" + letter.recipientID + ">"}")
                         .WithDescription(letter.content)
                         .WithColor(embedColor));
@@ -76,10 +78,15 @@ public static class ViewActions
             }
 
             // seperate every letter/action
-            List<Embed> toSend = new()
+            List<Embed> toSend = new();
+
+            if (player.Action.Length == 0)
             {
-                embed.Build()
-            };
+                playersWithoutAction.Add(player);
+            } else
+            {
+                toSend.Add(embed.Build());
+            }
 
             foreach (EmbedBuilder letter in letters)
             {
@@ -99,6 +106,16 @@ public static class ViewActions
             }
         }
 
+        await channel.SendMessageAsync(embed:
+            new EmbedBuilder()
+                .WithAuthor("-- N/A -- ")
+                .WithColor(Color.Red)
+                .WithTitle($"Players without action")
+                .WithDescription(String.Join(", ", playersWithoutAction.Select(player => player.Name)))
+                .Build()
+                );
+        await Task.Delay(100);
+        
         bool remove = (bool)command.Data.Options.First().Value;
 
         if(remove)

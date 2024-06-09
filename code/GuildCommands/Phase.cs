@@ -43,11 +43,10 @@ public static class Phase
             return;
         }
 
-        await command.RespondAsync($"Changing to .");
 
         var channel = command.Channel;
         guild.AdvancePhase();
 
-        await channel.SendMessageAsync($"{ (guild.CurrentPhase == Guild.Phase.Day ? "Night" : "Day")} has ended.\nIt is now " +guild.CurrentPhase+".");
+        await command.RespondAsync($"{ (guild.CurrentPhase == Guild.Phase.Day ? "Night" : "Day")} has ended.\nIt is now " +guild.CurrentPhase+".");
     }
 }

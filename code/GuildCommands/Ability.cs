@@ -19,9 +19,13 @@ namespace mafiacitybot.GuildCommands
                 .WithName("set")
                 .WithDescription("Set your current Action")
                 .WithType(ApplicationCommandOptionType.SubCommand)
+            ).AddOption(new SlashCommandOptionBuilder()
+                .WithName("clear")
+                .WithDescription("Clears your current Action")
+                .WithType(ApplicationCommandOptionType.SubCommand)
             );
 
-            
+
 
             try
             {
@@ -57,17 +61,22 @@ namespace mafiacitybot.GuildCommands
             switch (fieldName)
             {
                 case "view":
-                    await command.RespondAsync((player.Action == "" ? "No action set." : player.Action));
+                    await command.RespondAsync(player.Action == "" ? "No action set." : player.Action);
                     break;
                 case "set":
                     var mb = new ModalBuilder()
                         .WithTitle((guild.CurrentPhase == Guild.Phase.Day ? "Day Action" : "Night Action"))
                         .WithCustomId("action_modal")
-                        .AddTextInput("Action", "action", TextInputStyle.Paragraph, maxLength: 2000);
+                        .AddTextInput("Action", "action", TextInputStyle.Paragraph, maxLength: 2000, value:player.Action);
 
                     await command.RespondWithModalAsync(mb.Build());
 
                     // Modal is answered in program using a hook
+                    break;
+                case "clear":
+                    player.Action = "";
+                    await command.RespondAsync("Action cleared.");
+                    guild.Save();
                     break;
             }
 

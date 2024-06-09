@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using System.Text.Json;
 using mafiacitybot.GuildCommands;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace mafiacitybot;
 
@@ -17,9 +18,7 @@ public class Program
     public Dictionary<ulong, Guild> guilds = new Dictionary<ulong, Guild>();
     public SlashCommandHandler slashCommandHandler;
     public static Program instance;
-    //public static string DataPath = "./Data"; // for raspberry pi
-    public static string DataPath = "../../../../Data"; // testing
-
+    public static string DataPath = ( false ? "../../../../Data" : "./Data"); //set to false when putting on raspberry pi
     public Program()
     {
         instance = this;
@@ -85,6 +84,8 @@ public class Program
             await Info.CreateCommand(guild);
             await EnforceRoles.CreateCommand(guild);
             await ViewActions.CreateCommand(guild);
+            await ViewAction.CreateCommand(guild);
+            await Help.CreateCommand(guild);
             if (guild.Id == 1167188182262095952u)
             {
                 await RegisterCommands.CreateCommand(guild);

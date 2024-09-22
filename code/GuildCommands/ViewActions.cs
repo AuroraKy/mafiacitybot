@@ -7,17 +7,21 @@ namespace mafiacitybot.GuildCommands;
 
 public static class ViewActions
 {
-    public static async Task CreateCommand(SocketGuild guild)
+    public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
     {
         var command = new SlashCommandBuilder();
         command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
         command.WithName("view_actions");
         command.WithDescription("(Host-Only) Views all current action");
-        command.AddOption("clear", ApplicationCommandOptionType.Boolean, "Wether it should clear actions and letters on phase change", isRequired: true);
+        command.AddOption("clear", ApplicationCommandOptionType.Boolean, "Wether it should clear actions and letters on next phase change", isRequired: true);
 
         try
         {
-            await guild.CreateApplicationCommandAsync(command.Build());
+            if (guild != null) {
+                await guild.CreateApplicationCommandAsync(command.Build());
+            } else {
+                await client.CreateGlobalApplicationCommandAsync(command.Build());
+            }
         }
         catch (HttpException exception)
         {
@@ -118,16 +122,26 @@ public static class ViewActions
         
         bool remove = (bool)command.Data.Options.First().Value;
 
-        if(remove)
-        {
-            foreach (Player player in guild.Players)
-            {
-                player.Action = "";
-                player.letters = new();
+        List<EmbedBuilder> hletters = new List<EmbedBuilder>();
+        if (guild.hostLetters.Count > 0) {
+            foreach (Guild.Letter letter in guild.hostLetters) {
+                IUser? usertmp = program.client.GetUser(letter.recipientID);
+                hletters.Add(new EmbedBuilder()
+                    .WithAuthor("HOST LETTER")
+                    .WithTitle($"Letter to {usertmp?.Username ?? " <@" + letter.recipientID + ">"}")
+                    .WithDescription(letter.content)
+                    .WithColor(Color.DarkerGrey));
             }
-            guild.Save();
         }
 
-        await channel.SendMessageAsync("All actions displayed!");
+        foreach (EmbedBuilder msg in hletters) {
+            await channel.SendMessageAsync(embed: msg.Build());
+            await Task.Delay(100);
+        }
+
+        guild.clearNextPhaseChange = remove;
+        guild.Save();
+
+        await channel.SendMessageAsync("All actions displayed!" + (remove ? " Actions will be cleared upon next use of phase." : ""));
     }
 }

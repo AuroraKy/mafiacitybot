@@ -7,7 +7,7 @@ namespace mafiacitybot.GuildCommands
 {
     public static class Register
     {
-        public static async Task CreateCommand(SocketGuild guild)
+        public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
         {
             var command = new SlashCommandBuilder();
             command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
@@ -19,7 +19,11 @@ namespace mafiacitybot.GuildCommands
 
             try
             {
-                await guild.CreateApplicationCommandAsync(command.Build());
+                if (guild != null) {
+                    await guild.CreateApplicationCommandAsync(command.Build());
+                } else {
+                    await client.CreateGlobalApplicationCommandAsync(command.Build());
+                }
             }
             catch (HttpException exception)
             {
@@ -36,6 +40,15 @@ namespace mafiacitybot.GuildCommands
                     await command.RespondAsync("You must use Setup first!");
                     return;
                 }
+                if (!Guild.IsHostRoleUser(command, guild.HostRoleID)) {
+                    await command.RespondAsync($"You must have the host role to use this command!");
+                    return;
+                }
+                if (guild.HostChannelID != command.ChannelId) {
+                    await command.RespondAsync($"Command must be executed in the host channel!");
+                    return;
+                }
+
                 ulong userID = ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id;
                 ulong channelID = ((SocketGuildChannel)command.Data.Options.ElementAt(2).Value).Id;
                 string name = (string)command.Data.Options.ElementAt(1).Value;

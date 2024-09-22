@@ -6,7 +6,7 @@ namespace mafiacitybot.GuildCommands
 {
     public static class Actions
     { 
-        public static async Task CreateCommand(SocketGuild guild)
+        public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
         {
             var command = new SlashCommandBuilder();
             command.WithName("action");
@@ -29,7 +29,11 @@ namespace mafiacitybot.GuildCommands
 
             try
             {
-                await guild.CreateApplicationCommandAsync(command.Build());
+                if (guild != null) {
+                    await guild.CreateApplicationCommandAsync(command.Build());
+                } else {
+                    await client.CreateGlobalApplicationCommandAsync(command.Build());
+                }
             }
             catch (HttpException exception)
             {
@@ -45,6 +49,11 @@ namespace mafiacitybot.GuildCommands
             if (!program.guilds.TryGetValue((ulong)command.GuildId, out Guild guild))
             {
                 await command.RespondAsync($"You must use setup before being able to use this command!");
+                return;
+            }
+
+            if (guild.isLocked) {
+                await command.RespondAsync($"Action commands are currently locked, please notify the hosts if you believe this is not intended!");
                 return;
             }
 

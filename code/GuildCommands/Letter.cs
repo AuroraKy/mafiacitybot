@@ -7,7 +7,7 @@ namespace mafiacitybot.GuildCommands
 {
     public static class Letter
     {
-        public static async Task CreateCommand(SocketGuild guild)
+        public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
         {
             var command = new SlashCommandBuilder();
             command.WithName("letter");
@@ -37,7 +37,11 @@ namespace mafiacitybot.GuildCommands
 
             try
             {
-                await guild.CreateApplicationCommandAsync(command.Build());
+                if (guild != null) {
+                    await guild.CreateApplicationCommandAsync(command.Build());
+                } else {
+                    await client.CreateGlobalApplicationCommandAsync(command.Build());
+                }
             }
             catch (HttpException exception)
             {
@@ -56,11 +60,21 @@ namespace mafiacitybot.GuildCommands
                 return;
             }
 
-            if(guild.CurrentPhase != Guild.Phase.Night)
+            if (guild.CurrentPhase != Guild.Phase.Night)
             {
                 await command.RespondAsync($"Letter commands can only be used during the night!");
                 return;
             }
+
+            if (guild.isLocked) {
+                await command.RespondAsync($"Letter commands are currently locked, please notify the hosts if you believe this is not intended!");
+                return;
+            }
+
+            var fieldName = command.Data.Options.First().Name;
+            var options = command.Data.Options.First().Options;
+
+            bool isHost = Guild.IsHostRoleUser(command, guild.HostRoleID) && guild.HostChannelID == command.ChannelId;
 
             Player? player = guild.Players.Find(player => player.PlayerID == user.Id);
             if (player == null || player.ChannelID != channel.Id)
@@ -68,10 +82,6 @@ namespace mafiacitybot.GuildCommands
                 await command.RespondAsync("This command can only be used by a player in their channel!");
                 return;
             }
-
-            var fieldName = command.Data.Options.First().Name;
-            var options = command.Data.Options.First().Options;
-
 
             switch(fieldName)
             {
@@ -110,10 +120,22 @@ namespace mafiacitybot.GuildCommands
                     break;
                 case "add":
 
-                    SocketGuildUser recipient = options.ElementAt(0).Value as SocketGuildUser;
+                    if(player.letters.Count >= player.letterLimit) {
+                        await command.RespondAsync($"You've reached the allowed letter limit of {player.letterLimit}! You may not add any more letters.");
+                        return;
+                    }
+
+                    SocketGuildUser p = options.ElementAt(0).Value as SocketGuildUser;
+                    Player recipient = guild.Players.Find(x => x != null && x.PlayerID == p.Id);
+
+                    if (recipient == null) {
+                        await command.RespondAsync("Recipient must be a valid player in this game");
+                        return;
+                    }
+
                     var mb = new ModalBuilder()
                         .WithTitle("Add Letter")
-                        .WithCustomId("add_letter|" + recipient.Id)
+                        .WithCustomId("add_letter|" + recipient.PlayerID)
                         .AddTextInput("Letter content", "content", TextInputStyle.Paragraph, maxLength: 2000);
 
                     await command.RespondWithModalAsync(mb.Build());
@@ -147,6 +169,13 @@ namespace mafiacitybot.GuildCommands
                     {
                         long letter = (long)options.First().Value - 1;
                         SocketGuildUser rec = (SocketGuildUser)options.ElementAt(1).Value;
+                        Player to = guild.Players.Find(x => x != null && x.PlayerID == rec.Id);
+
+                        if (to == null) {
+                            await command.RespondAsync("Recipient must be a valid player in this game");
+                            return;
+                        }
+
 
                         if (letter < 0 || player.letters.Count < letter)
                         {
@@ -164,7 +193,9 @@ namespace mafiacitybot.GuildCommands
                     }
 
                     break;
-
+                default:
+                    await command.RespondAsync("You cannot use this command.");
+                    break;
             }
             guild.Save();
         }
@@ -182,8 +213,8 @@ namespace mafiacitybot.GuildCommands
                 return;
             }
 
-            Player? player = guild.Players.Find(player => player.PlayerID == user.Id);
-            if (player == null || player.ChannelID != channel.Id)
+            Player? player = guild.Players.Find(player => player?.PlayerID == user.Id);
+            if (!modal.Data.CustomId.StartsWith("host") && (player == null || player.ChannelID != channel.Id))
             {
                 await modal.RespondAsync("This command can only be used by a player in their channel!");
                 return;
@@ -197,10 +228,20 @@ namespace mafiacitybot.GuildCommands
             {
                 ulong recipientId = Convert.ToUInt64(modal.Data.CustomId.Split("|")[1]);
 
+
+                SocketGuild g = Program.instance.client.Guilds.First(guild => guild.Id == modal.GuildId);
+
+                SocketUser? recipient = g?.GetUser(recipientId);
+
+                if (recipient == null ) {
+                    await modal.RespondAsync("Recipient must be a valid user in this guild");
+                    return;
+                }
+
                 player.letters.Add(new Player.Letter(recipientId, content));
-                await modal.RespondAsync($"Letter added! Letter #{player.letters.Count} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:\n`{content.Substring(0, Math.Min(content.Length, 130))}...`");
-            }
-            else if(modal.Data.CustomId.StartsWith("edit_letter"))
+                string header = $"Letter added! Letter #{player.letters.Count} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:"; 
+                await modal.RespondAsync($"{header}\n`{content.Substring(0, Math.Min(content.Length, 2000-header.Length - 3))}`");
+            } else if(modal.Data.CustomId.StartsWith("edit_letter"))
             {
 
                 ulong recipientId = Convert.ToUInt64(modal.Data.CustomId.Split("|")[1]);
@@ -211,7 +252,8 @@ namespace mafiacitybot.GuildCommands
                 l.content = content;
                 player.letters.RemoveAt((int)letter);
                 player.letters.Insert((int)letter, l);
-                await modal.RespondAsync($"Letter changed! Letter #{letter + 1} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:\n`{content.Substring(0, Math.Min(content.Length, 130))}...`");
+                string header = $"Letter changed! Letter #{letter + 1} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:";
+                await modal.RespondAsync($"{header}\n`{content.Substring(0, Math.Min(content.Length, 2000 - header.Length - 3))}`");
             }
             guild.Save();
         }

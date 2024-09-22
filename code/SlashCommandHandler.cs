@@ -1,9 +1,20 @@
 ﻿using Discord.WebSocket;
 using mafiacitybot.GuildCommands;
-using System;
 
 namespace mafiacitybot;
 
+/**
+ * 
+ * 
+[x] make sure letters can only be set to valid recipients (players)
+[x] a command to send  out letters automatically
+[x] some way for hosts to add letters (assassin)
+[x] Lock actions/letters using command
+[x] Repost full letter on letter add
+
+test it lol
+
+*/
 public class SlashCommandHandler
 {
     public Program Program { get; set; }
@@ -48,6 +59,9 @@ public class SlashCommandHandler
                 case "letter":
                     _ = Letter.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
+                case "host_letter":
+                    _ = HostLetter.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
                 case "action":
                     _ = Actions.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
@@ -74,6 +88,9 @@ public class SlashCommandHandler
                     break;
                 case "help":
                     _ = Help.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "lock":
+                    _ = Lock.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
             }
         }

@@ -20,11 +20,13 @@ public class Guild
         string ability;
     }
 
-    public struct Letter
-    {
-        string sender;
-        string receiver;
-        string contents;
+    public struct Letter {
+        public ulong recipientID { get; set; }
+        public string content { get; set; }
+        public Letter(ulong recipientID, string content) {
+            this.recipientID = recipientID;
+            this.content = content;
+        }
     }
 
     public ulong GuildID { get; set; }
@@ -32,8 +34,12 @@ public class Guild
     public ulong HostChannelID { get; set; }
     public List<Player> Players { get; set; }
 
+    public List<Letter> hostLetters { get; set; }
     public Phase CurrentPhase { get; set; }
 
+    public bool clearNextPhaseChange { get; set; } = false;
+
+    public bool isLocked { get; set; } = false;
 
     public Guild(ulong guildID, ulong hostRoleID, ulong hostChannelID)
     {
@@ -41,6 +47,8 @@ public class Guild
         HostRoleID = hostRoleID;
         HostChannelID = hostChannelID;
         Players = new List<Player>();
+        hostLetters = new List<Letter>();
+        isLocked = false;
         CurrentPhase = Phase.Day;
     }
 

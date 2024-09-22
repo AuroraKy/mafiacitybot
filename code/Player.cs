@@ -21,6 +21,7 @@ public class Player
     }
 
     public List<Letter> letters { get; set; }
+    public int letterLimit {  get; set; }   
     public string Action { get; set; }
 
     public Player(ulong playerID, ulong channelID, string name)
@@ -30,6 +31,7 @@ public class Player
         Name = name;
         Alive = true;
         this.letters = new List<Letter>();
+        this.letterLimit = 1;
         Action = "";
 
     }

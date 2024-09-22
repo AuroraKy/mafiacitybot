@@ -6,7 +6,7 @@ namespace mafiacitybot.GuildCommands;
 
 public static class EnforceRoles
 {
-    public static async Task CreateCommand(SocketGuild guild)
+    public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
     {
         var command = new SlashCommandBuilder();
         command.WithName("enforce_roles");
@@ -15,7 +15,11 @@ public static class EnforceRoles
 
         try
         {
-            await guild.CreateApplicationCommandAsync(command.Build());
+            if (guild != null) {
+                await guild.CreateApplicationCommandAsync(command.Build());
+            } else {
+                await client.CreateGlobalApplicationCommandAsync(command.Build());
+            }
         }
         catch (HttpException exception)
         {

@@ -7,7 +7,7 @@ namespace mafiacitybot.GuildCommands;
 
 public static class ViewAction
 {
-    public static async Task CreateCommand(SocketGuild guild)
+    public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
     {
         var command = new SlashCommandBuilder();
         command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
@@ -17,7 +17,11 @@ public static class ViewAction
 
         try
         {
-            await guild.CreateApplicationCommandAsync(command.Build());
+            if (guild != null) {
+                await guild.CreateApplicationCommandAsync(command.Build());
+            } else {
+                await client.CreateGlobalApplicationCommandAsync(command.Build());
+            }
         }
         catch (HttpException exception)
         {

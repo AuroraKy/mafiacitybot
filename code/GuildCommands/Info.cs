@@ -6,7 +6,7 @@ namespace mafiacitybot.GuildCommands;
 
 public static class Info
 {
-    public static async Task CreateCommand(SocketGuild guild)
+    public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
     {
         var command = new SlashCommandBuilder();
         command.WithName("info");
@@ -14,7 +14,11 @@ public static class Info
 
         try
         {
-            await guild.CreateApplicationCommandAsync(command.Build());
+            if (guild != null) {
+                await guild.CreateApplicationCommandAsync(command.Build());
+            } else {
+                await client.CreateGlobalApplicationCommandAsync(command.Build());
+            }
         }
         catch (HttpException exception)
         {
@@ -30,6 +34,6 @@ public static class Info
             return;
         }
 
-        await command.RespondAsync($"Phase: {guild.CurrentPhase}\nPlayer amount: {guild.Players.Count}\nPlayers: {String.Join(", ", guild.Players.Select(pl => pl.Name))}");
+        await command.RespondAsync($"Phase: {guild.CurrentPhase}\nPlayer amount: {guild.Players.Count}\nPlayers: {String.Join(", ", guild.Players.Select(pl => pl.Name))}\nActions and letters are currently {(guild.isLocked ? "locked" : "available")}");
     }
 }

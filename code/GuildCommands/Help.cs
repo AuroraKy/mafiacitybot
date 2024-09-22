@@ -5,7 +5,7 @@ namespace mafiacitybot.GuildCommands;
 
 public static class Help
 {
-    public static async Task CreateCommand(SocketGuild guild)
+    public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
     {
         var command = new SlashCommandBuilder();
         command.WithName("help");
@@ -13,7 +13,11 @@ public static class Help
 
         try
         {
-            await guild.CreateApplicationCommandAsync(command.Build());
+            if (guild != null) {
+                await guild.CreateApplicationCommandAsync(command.Build());
+            } else {
+                await client.CreateGlobalApplicationCommandAsync(command.Build());
+            }
         }
         catch (HttpException exception)
         {

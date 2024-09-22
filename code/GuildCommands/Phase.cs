@@ -7,7 +7,7 @@ namespace mafiacitybot.GuildCommands;
 
 public static class Phase
 {
-    public static async Task CreateCommand(SocketGuild guild)
+    public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
     {
         var command = new SlashCommandBuilder();
         command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
@@ -16,7 +16,11 @@ public static class Phase
 
         try
         {
-            await guild.CreateApplicationCommandAsync(command.Build());
+            if (guild != null) {
+                await guild.CreateApplicationCommandAsync(command.Build());
+            } else {
+                await client.CreateGlobalApplicationCommandAsync(command.Build());
+            }
         }
         catch (HttpException exception)
         {
@@ -47,6 +51,19 @@ public static class Phase
         var channel = command.Channel;
         guild.AdvancePhase();
 
-        await command.RespondAsync($"{ (guild.CurrentPhase == Guild.Phase.Day ? "Night" : "Day")} has ended.\nIt is now " +guild.CurrentPhase+".");
+        bool cleared = false;
+        if(guild.clearNextPhaseChange) {
+            foreach (Player player in guild.Players) {
+                player.Action = "";
+                player.letters = new();
+            }
+            guild.hostLetters = new();
+            cleared = true;
+            guild.clearNextPhaseChange = false;
+            guild.Save();
+        }
+
+        await command.RespondAsync($"{ (guild.CurrentPhase == Guild.Phase.Day ? "Night" : "Day")} has ended.\nIt is now " +guild.CurrentPhase+"."
+            + (cleared ? "\nAll Actions have been cleared!" : ""));
     }
 }

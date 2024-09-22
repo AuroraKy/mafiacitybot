@@ -5,6 +5,7 @@ using System.Text.Json;
 using mafiacitybot.GuildCommands;
 using System.Reflection;
 using System.Diagnostics;
+using System;
 
 namespace mafiacitybot;
 
@@ -69,28 +70,33 @@ public class Program
         await guildCommandsTask;
     }
 
-    public async Task CreateCommands()
-    {
-        foreach (SocketGuild guild in client.Guilds)
-        {
-            await Ping.CreateCommand(guild);
-            await Phase.CreateCommand(guild);
-            await Setup.CreateCommand(guild);
-            await Register.CreateCommand(guild);
-            await Letter.CreateCommand(guild);
-            await Actions.CreateCommand(guild);
-            await ClearPlayers.CreateCommand(guild);
-            await ClearPlayer.CreateCommand(guild);
-            await Info.CreateCommand(guild);
-            await EnforceRoles.CreateCommand(guild);
-            await ViewActions.CreateCommand(guild);
-            await ViewAction.CreateCommand(guild);
-            await Help.CreateCommand(guild);
+    public async Task CreateCommands() {
+        _ = LogAsync(new LogMessage(LogSeverity.Info, "CreateCommands", "Creating commands..."));
+
+        
+        foreach (SocketGuild guild in client.Guilds) {
+            /*await Ping.CreateCommand(client, guild);
+            await Phase.CreateCommand(client, guild);
+            await Setup.CreateCommand(client, guild);
+            await Register.CreateCommand(client, guild);
+            await Letter.CreateCommand(client, guild);
+            await HostLetter.CreateCommand(client, guild);
+            await Actions.CreateCommand(client, guild);
+            await ClearPlayers.CreateCommand(client, guild);
+            await ClearPlayer.CreateCommand(client, guild);
+            await Info.CreateCommand(client, guild);
+            await EnforceRoles.CreateCommand(client, guild);
+            await ViewActions.CreateCommand(client, guild);
+            await ViewAction.CreateCommand(client, guild);
+            await Help.CreateCommand(client, guild);*/
+            await HostLetter.CreateCommand(client, guild);
+            await Lock.CreateCommand(client, guild);
             if (guild.Id == 1167188182262095952u)
             {
-                await RegisterCommands.CreateCommand(guild);
+                await RegisterCommands.CreateCommand(client, guild);
             }
         }
+        _ = LogAsync(new LogMessage(LogSeverity.Info, "CreateCommands", "Done creating commands..."));
     }
     public async Task LoadGuildCommands()
     {
@@ -102,6 +108,7 @@ public class Program
         }
 
         client.ModalSubmitted += Letter.ModalSubmitted;
+        client.ModalSubmitted += HostLetter.ModalSubmitted;
         client.ModalSubmitted += Actions.ModalSubmitted;
     }
 

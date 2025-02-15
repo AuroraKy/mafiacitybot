@@ -20,6 +20,8 @@ public class Program
     public SlashCommandHandler slashCommandHandler;
     public static Program instance;
     public static string DataPath = ( false ? "../../../../Data" : "./Data"); //set to false when putting on raspberry pi
+    public static string VERSION = "1.2.0";
+
     public Program()
     {
         instance = this;
@@ -75,7 +77,7 @@ public class Program
 
         
         foreach (SocketGuild guild in client.Guilds) {
-            /*await Ping.CreateCommand(client, guild);
+            await Ping.CreateCommand(client, guild);
             await Phase.CreateCommand(client, guild);
             await Setup.CreateCommand(client, guild);
             await Register.CreateCommand(client, guild);
@@ -88,13 +90,14 @@ public class Program
             await EnforceRoles.CreateCommand(client, guild);
             await ViewActions.CreateCommand(client, guild);
             await ViewAction.CreateCommand(client, guild);
-            await Help.CreateCommand(client, guild);*/
+            await Help.CreateCommand(client, guild);
             await HostLetter.CreateCommand(client, guild);
             await Lock.CreateCommand(client, guild);
             if (guild.Id == 1167188182262095952u)
             {
                 await RegisterCommands.CreateCommand(client, guild);
             }
+            _ = LogAsync(new LogMessage(LogSeverity.Info, "CreateCommands", "Done creating commands for guild "+guild.Name+" ("+guild.Id+")"));
         }
         _ = LogAsync(new LogMessage(LogSeverity.Info, "CreateCommands", "Done creating commands..."));
     }

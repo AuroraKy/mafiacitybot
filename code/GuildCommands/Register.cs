@@ -13,9 +13,10 @@ namespace mafiacitybot.GuildCommands
             command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
             command.WithName("register");
             command.WithDescription("Registers a player and their personal channel.");
-            command.AddOption("user", ApplicationCommandOptionType.User, "change this later", isRequired: true);
+            command.AddOption("user", ApplicationCommandOptionType.User, "User", isRequired: true);
             command.AddOption("name", ApplicationCommandOptionType.String, "The user's name.", isRequired: true);
-            command.AddOption("channel", ApplicationCommandOptionType.Channel, "change this later", isRequired: true);
+            command.AddOption("channel", ApplicationCommandOptionType.Channel, "Player channel", isRequired: true);
+            command.AddOption("multilink", ApplicationCommandOptionType.User, "If this is to register user to an existing player, write existing player here", isRequired: false);
 
             try
             {
@@ -50,11 +51,32 @@ namespace mafiacitybot.GuildCommands
                 }
 
                 ulong userID = ((SocketGuildUser)command.Data.Options.ElementAt(0).Value).Id;
+                Player? userPlayer = guild.Players.Find(player => player.IsPlayer(userID));
+                if (userPlayer != null) {
+                    await command.RespondAsync($"Player {userPlayer.Name} already exists! Cannot register existing player.");
+                    return;
+                }
+
                 ulong channelID = ((SocketGuildChannel)command.Data.Options.ElementAt(2).Value).Id;
                 string name = (string)command.Data.Options.ElementAt(1).Value;
-                guild.AddPlayer(new Player
-                (userID, channelID, name));
-                await command.RespondAsync($"Registered new player {program.client.GetUserAsync(userID)} with channel {program.client.GetChannelAsync(channelID)}.");
+                if(command.Data.Options.Count > 3) {
+                    
+                    ulong mainID = ((SocketGuildUser)command.Data.Options.ElementAt(3).Value).Id;
+                    Player? player = guild.Players.Find(player => player.IsPlayer(mainID));
+                    if(player == null) {
+                        await command.RespondAsync($"Could not find main player {program.client.GetUserAsync(mainID)} to link to, are they a registered player?");
+
+                    } else {
+                        player.LinkedIDs.Add(userID);
+                        player.LinkedNames[userID] = name;
+                        await command.RespondAsync($"Registered user {program.client.GetUserAsync(userID)} under {program.client.GetUserAsync(mainID)}.");
+                    }
+                } else {
+                    guild.AddPlayer(new Player
+                                   (userID, channelID, name));
+                    await command.RespondAsync($"Registered new player {program.client.GetUserAsync(userID)} with channel {program.client.GetChannelAsync(channelID)}.");
+
+                }
             }
             catch (Exception e)
             {

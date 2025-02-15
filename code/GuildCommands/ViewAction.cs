@@ -51,7 +51,7 @@ public static class ViewAction
         SocketGuildUser user = (SocketGuildUser)command.Data.Options.First().Value;
 
         var channel = command.Channel;
-        Player? player = guild.Players.Find(player => player.PlayerID == user.Id);
+        Player? player = guild.Players.Find(player => player.IsPlayer(user.Id));
         if (player == null)
         {
             _ = command.RespondAsync($"Player {user.Nickname} ({user.DisplayName}) not found");

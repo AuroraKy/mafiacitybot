@@ -128,8 +128,8 @@ namespace mafiacitybot.GuildCommands
                     break;
                 case "add":
 
-                    SocketGuildUser p = options.ElementAt(0).Value as SocketGuildUser;
-                    Player recipient = guild.Players.Find(x => x != null && x.PlayerID == p.Id);
+                    SocketGuildUser? p = options.ElementAt(0).Value as SocketGuildUser;
+                    Player? recipient = guild.Players.Find(player => player != null && player.IsPlayer(p.Id));
 
                     if (recipient == null) {
                         await command.RespondAsync("Recipient must be a valid player in this game");
@@ -166,7 +166,7 @@ namespace mafiacitybot.GuildCommands
                         long letter = (long)options.First().Value - 1;
                         SocketGuildUser rec = (SocketGuildUser)options.ElementAt(1).Value;
 
-                        Player to = guild.Players.Find(x => x != null && x.PlayerID == rec.Id);
+                        Player? to = guild.Players.Find(x => x != null && x.IsPlayer(rec.Id));
 
                         if (to == null) {
                             await command.RespondAsync("Recipient must be a valid player in this game");
@@ -195,7 +195,7 @@ namespace mafiacitybot.GuildCommands
                     foreach (Player ply in guild.Players) {
                         if (ply.letters.Count > 0) {
                             foreach (Player.Letter letter in ply.letters) {
-                                Player? sendTo = guild.Players.Find(p => p != null && p.PlayerID == letter.recipientID);
+                                Player? sendTo = guild.Players.Find(p => p != null && p.IsPlayer(letter.recipientID));
                                 if (sendTo == null) {
                                     await command.RespondAsync("Cannot find recipient with id " + letter.recipientID + " as user.. stopping.");
                                     return;
@@ -211,7 +211,7 @@ namespace mafiacitybot.GuildCommands
                     }
                     foreach (Guild.Letter letter in guild.hostLetters) {
 
-                        Player? sendTo = guild.Players.Find(p => p != null && p.PlayerID == letter.recipientID);
+                        Player? sendTo = guild.Players.Find(p => p != null && p.IsPlayer(letter.recipientID));
                         if (sendTo == null) {
                             await command.RespondAsync("Cannot find recipient with id " + letter.recipientID + " as player.. stopping.");
                             return;
@@ -261,7 +261,7 @@ namespace mafiacitybot.GuildCommands
                     SocketGuildUser player = (SocketGuildUser)options.ElementAt(0).Value;
                     int limit = Convert.ToInt32((double)options.ElementAt(1).Value);
 
-                    Player playerToSetLimitOf = guild.Players.Find(x => x != null && x.PlayerID == player.Id);
+                    Player? playerToSetLimitOf = guild.Players.Find(x => x != null && x.IsPlayer(player.Id));
 
                     if (playerToSetLimitOf == null) {
                         await command.RespondAsync("Recipient must be a valid player in this game");
@@ -301,7 +301,7 @@ namespace mafiacitybot.GuildCommands
 
                 ulong recipientId = Convert.ToUInt64(modal.Data.CustomId.Split("|")[1]);
 
-                Player recipient = guild.Players.Find(x => x != null && x.PlayerID == recipientId);
+                Player? recipient = guild.Players.Find(x => x != null && x.IsPlayer(recipientId));
 
                 if (recipient == null) {
                     await modal.RespondAsync("Recipient must be a valid player in this game");

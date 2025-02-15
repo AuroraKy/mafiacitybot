@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Net;
 using Discord.WebSocket;
+using System.Numerics;
 
 namespace mafiacitybot.GuildCommands;
 
@@ -51,7 +52,7 @@ public static class EnforceRoles
 
         foreach(SocketGuildUser user in g.Users)
         {
-            if(guild.Players.Find(p => p.PlayerID == user.Id) != null)
+            if(guild.Players.Find(player => player.IsPlayer(user.Id)) != null)
             {
                 if(!user.Roles.Contains(role))
                 {

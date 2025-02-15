@@ -57,7 +57,7 @@ namespace mafiacitybot.GuildCommands
                 return;
             }
 
-            Player? player = guild.Players.Find(player => player.PlayerID == user.Id);
+            Player? player = guild.Players.Find(player => player.IsPlayer(user.Id));
             if (player == null || player.ChannelID != channel.Id)
             {
                 await command.RespondAsync("This command can only be used by a player in their channel!");
@@ -105,7 +105,7 @@ namespace mafiacitybot.GuildCommands
                 return;
             }
 
-            Player? player = guild.Players.Find(player => player.PlayerID == user.Id);
+            Player? player = guild.Players.Find(player => player.IsPlayer(user.Id));
             if (player == null || player.ChannelID != channel.Id)
             {
                 await modal.RespondAsync("This command can only be used by a player in their channel!");

@@ -76,7 +76,7 @@ namespace mafiacitybot.GuildCommands
 
             bool isHost = Guild.IsHostRoleUser(command, guild.HostRoleID) && guild.HostChannelID == command.ChannelId;
 
-            Player? player = guild.Players.Find(player => player.PlayerID == user.Id);
+            Player? player = guild.Players.Find(player => player.IsPlayer(user.Id));
             if (player == null || player.ChannelID != channel.Id)
             {
                 await command.RespondAsync("This command can only be used by a player in their channel!");
@@ -125,8 +125,8 @@ namespace mafiacitybot.GuildCommands
                         return;
                     }
 
-                    SocketGuildUser p = options.ElementAt(0).Value as SocketGuildUser;
-                    Player recipient = guild.Players.Find(x => x != null && x.PlayerID == p.Id);
+                    SocketGuildUser? p = options.ElementAt(0).Value as SocketGuildUser;
+                    Player? recipient = guild.Players.Find(x => x != null && x.IsPlayer(p.Id));
 
                     if (recipient == null) {
                         await command.RespondAsync("Recipient must be a valid player in this game");
@@ -169,7 +169,7 @@ namespace mafiacitybot.GuildCommands
                     {
                         long letter = (long)options.First().Value - 1;
                         SocketGuildUser rec = (SocketGuildUser)options.ElementAt(1).Value;
-                        Player to = guild.Players.Find(x => x != null && x.PlayerID == rec.Id);
+                        Player? to = guild.Players.Find(x => x != null && x.IsPlayer(rec.Id));
 
                         if (to == null) {
                             await command.RespondAsync("Recipient must be a valid player in this game");
@@ -213,7 +213,11 @@ namespace mafiacitybot.GuildCommands
                 return;
             }
 
-            Player? player = guild.Players.Find(player => player?.PlayerID == user.Id);
+            Player? player = guild.Players.Find(player => player != null && player.IsPlayer(user.Id));
+            if(player == null) {
+                await modal.RespondAsync("Cannot find player with ID " + user.Id);
+                return;
+            }
             if (!modal.Data.CustomId.StartsWith("host") && (player == null || player.ChannelID != channel.Id))
             {
                 await modal.RespondAsync("This command can only be used by a player in their channel!");

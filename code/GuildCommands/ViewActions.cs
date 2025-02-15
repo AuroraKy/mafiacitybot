@@ -115,7 +115,7 @@ public static class ViewActions
                 .WithAuthor("-- N/A -- ")
                 .WithColor(Color.Red)
                 .WithTitle($"Players without action")
-                .WithDescription(String.Join(", ", playersWithoutAction.Select(player => player.Name)))
+                .WithDescription(String.Join(", ", playersWithoutAction.Select(player => player.Name + (player.LinkedNames.Count > 0 ? $" ({String.Join(", ", player.LinkedNames.Select(x => x.Value))})" : ""))))
                 .Build()
                 );
         await Task.Delay(100);

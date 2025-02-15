@@ -41,11 +41,18 @@ public static class ClearPlayer
         }
         SocketGuildUser user = (SocketGuildUser)command.Data.Options.ElementAt(0).Value;
         ulong userID = (user).Id;
-        Player? player = guild.Players.Find(player => player.PlayerID == userID);
+        Player? player = guild.Players.Find(player => player.IsPlayer(user.Id));
         if(player != null)
         {
-            guild.Players.Remove(player);
-            await command.RespondAsync($"Removed {player.Name} (<@{player.PlayerID}> <#{player.ChannelID}>) from players");
+            if(player.PlayerID != userID) {
+                player.LinkedIDs.Remove(userID);
+                var name = player.LinkedNames[userID];
+                player.LinkedNames.Remove(userID);
+                await command.RespondAsync($"Removed {name} link from player {player.Name}");
+            } else {
+                guild.Players.Remove(player);
+                await command.RespondAsync($"Removed {player.Name} {(player.LinkedNames.Count > 0 ? $" (Also: {String.Join(", ", player.LinkedNames.Select(x => x.Value))}) " : "")}(<@{player.PlayerID}> <#{player.ChannelID}>) from players");
+            }
             guild.Save();
         } else
         {

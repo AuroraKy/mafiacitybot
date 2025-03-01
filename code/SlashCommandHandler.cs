@@ -42,7 +42,7 @@ public class SlashCommandHandler
             switch (command.Data.Name)
             {
                 case "ping":
-                    _ = Ping.HandleCommand(command).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    _ = Ping.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "phase":
                     _ = Phase.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);

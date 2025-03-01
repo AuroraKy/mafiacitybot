@@ -2,6 +2,7 @@
 using Discord.Net;
 using Discord.Rest;
 using Discord.WebSocket;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace mafiacitybot.GuildCommands;
@@ -28,7 +29,7 @@ public static class Ping
         }
     }
 
-    public static async Task HandleCommand(SocketSlashCommand command)
+    public static async Task HandleCommand(SocketSlashCommand command, Program program)
     {
         DateTimeOffset now = DateTimeOffset.Now;
 

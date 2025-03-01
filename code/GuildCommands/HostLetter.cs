@@ -28,6 +28,7 @@ namespace mafiacitybot.GuildCommands
                 .WithDescription("Remove a letter in the host list.")
                 .WithType(ApplicationCommandOptionType.SubCommand)
                 .AddOption("letter", ApplicationCommandOptionType.Integer, "The letter number to delete.", isRequired: true)
+                .AddOption("from", ApplicationCommandOptionType.User, "Delete letter from this user instead", isRequired: false)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("edit")
                 .WithDescription("Edit a letter in the list.")
@@ -144,7 +145,25 @@ namespace mafiacitybot.GuildCommands
                     break;
 
                 case "remove":
-                    if (guild.hostLetters?.Count < 1) {
+                    if(options.Count >= 2) {
+                        SocketGuildUser? remove_for = options.ElementAt(1).Value as SocketGuildUser;
+                        Player? remove_for_player = guild.Players.Find(player => player != null && player.IsPlayer(remove_for.Id));
+
+                        if(remove_for_player == null) {
+                            await command.RespondAsync("Cannot find player you want to delete letters for");
+                            return;
+                        }
+
+                        long letter = (long)options.First().Value - 1;
+
+                        if (letter < 0 || remove_for_player.letters.Count < letter) {
+                            await command.RespondAsync("Invalid letter number.\nValid letter numbers: " + new Range(0, remove_for_player.letters.Count - 1));
+                        } else {
+                            remove_for_player.letters.RemoveAt((int)letter);
+                            await command.RespondAsync("Removed letter #" + letter + 1 + " from "+remove_for_player.Name);
+                        }
+                        
+                    } else if (guild.hostLetters?.Count < 1) {
                         await command.RespondAsync("No host letters!");
                     } else {
                         long letter = (long)options.First().Value - 1;

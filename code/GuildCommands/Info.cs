@@ -34,7 +34,7 @@ public static class Info
             return;
         }
 
-        await command.RespondAsync($"Mafia City Bot by Aurora, V{Program.VERSION}" +
+        await command.RespondAsync($"Mafia City Bot by Aurora V{Program.VERSION}" +
             $"\nPhase: {guild.CurrentPhase}" +
             $"\nPlayer amount: {guild.Players.Count}" +
             $"\nPlayers: {String.Join(", ", guild.Players.Select(pl => pl.Name + (pl.LinkedNames.Count > 0 ? $" ({String.Join(", ",pl.LinkedNames.Select(x => x.Value))})": "")))}" +

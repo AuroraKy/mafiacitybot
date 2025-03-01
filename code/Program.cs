@@ -20,7 +20,7 @@ public class Program
     public SlashCommandHandler slashCommandHandler;
     public static Program instance;
     public static string DataPath = ( false ? "../../../../Data" : "./Data"); //set to false when putting on raspberry pi
-    public static string VERSION = "1.2.0";
+    public static string VERSION = "1.2.1";
 
     public Program()
     {

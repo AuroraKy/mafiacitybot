@@ -35,9 +35,8 @@ public class Guild
     public List<Player> Players { get; set; }
 
     public List<Letter> hostLetters { get; set; }
+    public Dictionary<string, List<Player>> Votes { get; set; }
     public Phase CurrentPhase { get; set; }
-
-    public bool clearNextPhaseChange { get; set; } = false;
 
     public bool isLocked { get; set; } = false;
 
@@ -48,6 +47,7 @@ public class Guild
         HostChannelID = hostChannelID;
         Players = new List<Player>();
         hostLetters = new List<Letter>();
+        Votes = new();
         isLocked = false;
         CurrentPhase = Phase.Day;
     }

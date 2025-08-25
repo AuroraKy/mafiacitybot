@@ -6,11 +6,19 @@ namespace mafiacitybot.GuildCommands;
 
 public static class RegisterCommands
 {
+
+    public static List<ulong> approvedUsers = new()
+    {
+        185851310308982804u, // Aurora
+        558103204705861652u, // Gamation
+        201779401044525056u // Bissy
+    };
+    
     public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
     {
         var command = new SlashCommandBuilder();
         command.WithName("register_commands");
-        command.WithDescription("Register all commands with discord, for changes");
+        command.WithDescription("Register all commands with Discord, for changes");
 
         try
         {
@@ -28,12 +36,15 @@ public static class RegisterCommands
 
     public static async Task HandleCommand(SocketSlashCommand command, Program program)
     {
-        if(command.User.Id != 185851310308982804u)
+        if (approvedUsers.Contains(command.User.Id) || command.GuildId == 1167188182262095952)
         {
-            await command.RespondAsync("This command is just for Aurora to reload the commands.");
-            return;
+            await command.RespondAsync("Registering commands...");
+            await program.CreateCommands();
+
         }
-        await command.RespondAsync("Registering commands...");
-        program.CreateCommands();
+        else
+        {
+            await command.RespondAsync("This command is only for developers to reload the commands.");
+        }
     }
 }

@@ -20,6 +20,8 @@ Global
 		{0912FC2E-599B-402F-B3CC-7807EBC1F42F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0912FC2E-599B-402F-B3CC-7807EBC1F42F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0912FC2E-599B-402F-B3CC-7807EBC1F42F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0912FC2E-599B-402F-B3CC-7807EBC1F42F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0912FC2E-599B-402F-B3CC-7807EBC1F42F}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

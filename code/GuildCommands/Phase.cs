@@ -12,7 +12,7 @@ public static class Phase
         var command = new SlashCommandBuilder();
         command.WithDefaultMemberPermissions(GuildPermission.ManageRoles);
         command.WithName("phase");
-        command.WithDescription("Changes the phase from day to night (or vice versa).");
+        command.WithDescription("Changes the Phase from Day to Night (or vice versa).");
 
         try
         {
@@ -32,38 +32,35 @@ public static class Phase
     {
         if (!program.guilds.TryGetValue(Convert.ToUInt64(command.GuildId), out Guild guild))
         {
-            await command.RespondAsync($"You must use setup before being able to use this command!");
+            await command.RespondAsync($"You must use /setup before being able to use this command!");
             return;
         }
 
         if (!Guild.IsHostRoleUser(command, guild.HostRoleID))
         {
-            await command.RespondAsync($"You must have the host role to use this command!");
+            await command.RespondAsync($"You must have the HOST role to use this command!");
             return;
         }
         if (guild.HostChannelID != command.ChannelId)
         {
-            await command.RespondAsync($"Command must be executed in the host channel!");
+            await command.RespondAsync($"Command must be executed in the HOST bot channel!");
             return;
         }
 
 
         var channel = command.Channel;
         guild.AdvancePhase();
-
-        bool cleared = false;
-        if(guild.clearNextPhaseChange) {
-            foreach (Player player in guild.Players) {
-                player.Action = "";
-                player.letters = new();
-            }
-            guild.hostLetters = new();
-            cleared = true;
-            guild.clearNextPhaseChange = false;
-            guild.Save();
+        
+        foreach (Player player in guild.Players) {
+            player.Action = "";
+            player.letters = new();
+            player.CroakVote = "";
         }
+        
+        guild.hostLetters = new();
+        guild.Votes = new();
+        guild.Save();
 
-        await command.RespondAsync($"{ (guild.CurrentPhase == Guild.Phase.Day ? "Night" : "Day")} has ended.\nIt is now " +guild.CurrentPhase+"."
-            + (cleared ? "\nAll Actions have been cleared!" : ""));
+        await command.RespondAsync($"{ (guild.CurrentPhase == Guild.Phase.Day ? "Night" : "Day")} has ended.\nIt is now " + guild.CurrentPhase + ".\nAll Actions have been cleared!");
     }
 }

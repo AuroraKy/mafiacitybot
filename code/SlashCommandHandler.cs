@@ -92,6 +92,9 @@ public class SlashCommandHandler
                 case "lock":
                     _ = Lock.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
+                case "vote":
+                    _ = Vote.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
             }
         }
         else

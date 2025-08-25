@@ -93,6 +93,7 @@ public class Program
             await Help.CreateCommand(client, guild);
             await HostLetter.CreateCommand(client, guild);
             await Lock.CreateCommand(client, guild);
+            await Vote.CreateCommand(client, guild);
             if (guild.Id == 1167188182262095952u)
             {
                 await RegisterCommands.CreateCommand(client, guild);

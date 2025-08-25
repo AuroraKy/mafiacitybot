@@ -38,6 +38,6 @@ public static class Info
             $"\nPhase: {guild.CurrentPhase}" +
             $"\nPlayer amount: {guild.Players.Count}" +
             $"\nPlayers: {String.Join(", ", guild.Players.Select(pl => pl.Name + (pl.LinkedNames.Count > 0 ? $" ({String.Join(", ",pl.LinkedNames.Select(x => x.Value))})": "")))}" +
-            $"\nActions and letters are currently {(guild.isLocked ? "locked" : "available")}");
+            $"\nActions and *Letters* are currently {(guild.isLocked ? "locked" : "available")}.");
     }
 }

@@ -80,6 +80,12 @@ public static class ViewAction
                 count++;
             }
         }
+        
+        EmbedBuilder voteEmbed = new EmbedBuilder()
+            .WithAuthor(user)
+            .WithColor(player.CroakVote == "" ? Color.DarkerGrey : Color.DarkRed)
+            .WithTitle("Croak Vote")
+            .WithDescription(player.CroakVote == "" ? "None set." : player.CroakVote);
 
         // seperate every letter/action
         List<Embed> toSend = new()
@@ -91,6 +97,8 @@ public static class ViewAction
         {
             toSend.Add(letter.Build());
         }
+        
+        toSend.Add(voteEmbed.Build());
 
         foreach (Embed msg in toSend)
         {

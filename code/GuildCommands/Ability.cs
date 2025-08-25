@@ -10,18 +10,18 @@ namespace mafiacitybot.GuildCommands
         {
             var command = new SlashCommandBuilder();
             command.WithName("action");
-            command.WithDescription("Change your day/night action.");
+            command.WithDescription("Change your current action.");
             command.AddOption(new SlashCommandOptionBuilder()
                 .WithName("view")
-                .WithDescription("View your current Action")
+                .WithDescription("View your current action.")
                 .WithType(ApplicationCommandOptionType.SubCommand)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("set")
-                .WithDescription("Set your current Action")
+                .WithDescription("Set your current action.")
                 .WithType(ApplicationCommandOptionType.SubCommand)
             ).AddOption(new SlashCommandOptionBuilder()
                 .WithName("clear")
-                .WithDescription("Clears your current Action")
+                .WithDescription("Clear your current action.")
                 .WithType(ApplicationCommandOptionType.SubCommand)
             );
 
@@ -48,7 +48,7 @@ namespace mafiacitybot.GuildCommands
 
             if (!program.guilds.TryGetValue((ulong)command.GuildId, out Guild guild))
             {
-                await command.RespondAsync($"You must use setup before being able to use this command!");
+                await command.RespondAsync($"You must use /setup before being able to use this command!");
                 return;
             }
 
@@ -101,14 +101,14 @@ namespace mafiacitybot.GuildCommands
 
             if (!Program.instance.guilds.TryGetValue((ulong)modal.GuildId, out Guild guild))
             {
-                await modal.RespondAsync($"You must use setup before being able to use this command!");
+                await modal.RespondAsync($"You must use /setup before being able to use this command!");
                 return;
             }
 
             Player? player = guild.Players.Find(player => player.IsPlayer(user.Id));
             if (player == null || player.ChannelID != channel.Id)
             {
-                await modal.RespondAsync("This command can only be used by a player in their channel!");
+                await modal.RespondAsync("This command can only be used by a PLAYER in their channel!");
                 return;
             }
 

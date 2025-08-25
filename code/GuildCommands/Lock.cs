@@ -11,8 +11,11 @@ public static class Lock
     {
         var command = new SlashCommandBuilder();
         command.WithName("lock");
-        command.WithDescription("(Host-Only) Locks/unlocks all actions and letters.");
-        
+        command.WithDescription("(Host-Only) Toggles the lock on actions and *Letters*.");
+        command.AddOption("announce", ApplicationCommandOptionType.Boolean,
+                "Whether to announce the lock toggle in all PLAYER channels.",
+                false, true)
+            ;        
         try
         {
             if (guild != null) {
@@ -41,18 +44,28 @@ public static class Lock
         
         if (!Guild.IsHostRoleUser(command, guild.HostRoleID))
         {
-            await command.RespondAsync($"You must have the host role to use this command!");
+            await command.RespondAsync($"You must have the HOST role to use this command!");
             return;
         }
         if (guild.HostChannelID != command.ChannelId)
         {
-            await command.RespondAsync($"Command must be executed in the host channel!");
+            await command.RespondAsync($"Command must be executed in the HOST bot channel!");
             return;
         }
 
         guild.isLocked = !guild.isLocked;
 
-        await command.RespondAsync("Actions and letter commands are now " + (guild.isLocked ? "locked, and cannot be used until unlocked." : "unlocked and can be used."));
+        await command.RespondAsync("Actions and *Letter* commands are now " + (guild.isLocked ? "locked, and cannot be used until unlocked." : "unlocked and can be used."));
+        
+        if ((bool)command.Data.Options.First().Value)
+        {
+            foreach (Player player in guild.Players)
+            { 
+                var playerChannel = await program.client.GetChannelAsync(player.ChannelID) as ITextChannel;
+                await playerChannel.SendMessageAsync("*Actions and Letter commands are now " + (guild.isLocked ? "locked. Hold tight for the Phase transition!" : "unlocked and can be used. Good luck."));
+            }
+        }
+
         guild.Save();
         
     }

@@ -9,7 +9,7 @@ public static class Help
     {
         var command = new SlashCommandBuilder();
         command.WithName("help");
-        command.WithDescription("Provides information about this bot and it's commands.");
+        command.WithDescription("Provides information about this bot and its commands.");
 
         try
         {
@@ -30,24 +30,23 @@ public static class Help
 
         EmbedBuilder embed = new EmbedBuilder()
                     .WithColor(new Color(255, 192, 255))
-                    .WithTitle($"Mafia Bot Help")
-                    .WithDescription("General usage:\n**Every day or night use /action set to set your action for that phase, use /letter add <recipient> to send out letters at night.**\n\nFull info for commands that are not host-only.\nAll commands besides ping require a game to be setup by a host.")
+                    .WithTitle($"Welcome to the Mafia City Bot!")
+                    .WithDescription("**General usage:**\nEvery *Phase*, use /action set to set your action - using *Abilities* or *Items*, *Croak Voting*, whatever. If it's a *Night Phase*, use /letter add <recipient> to send out a *Letter*.\n\nBelow is a list of all PLAYER commands.\n*All commands besides ping require a game to be setup by a Host*.")
                     .WithFields(new List<EmbedFieldBuilder>{ 
-                        new EmbedFieldBuilder().WithName("Action").WithValue(@"Can only be used in your player channel.
+                        new EmbedFieldBuilder().WithName("Action").WithValue(@"*Action commands can only be used in your PLAYER channel.*
 
-/action view - Displays your current action in chat
-/action set - Opens a modal to set an action (up to 2000 chars) that represents what you will do today/tonight. Will post the first 180 characters of it in chat to confirm.
+/action view - Displays your currently set action for you.
+/action set - Opens a box to set an action containing what you will do this *Phase*.
 /action clear - Removes your action by clearing it").WithIsInline(false),
-                        new EmbedFieldBuilder().WithName("Letters").WithValue(@"Can only be used at night in your player channel.
-This lets you add any amount of letters you want, usually you can only send one.
+                        new EmbedFieldBuilder().WithName("Letters").WithValue(@"*Letter commands can only be used at Night in your PLAYER channel.*
 
-/letter view - Shows the first 180 characters of all letters you have set to be send tonight
-/letter view <nummer> - Shows the full text of letter nummer <nummer>
-/letter add <recipient> - Opens a modal to add a new letter (up to 2000 chars) to user <recipient>. Will post the first 180 characters of it in chat to confirm.
-/letter remove <nummer> - Removes letter nummer <nummer>
-/letter edit <nummer> <recipient> - Edits letter nummer <nummer>, also changes recipient to <recipient>. Will post the first 180 characters of it in chat to confirm.").WithIsInline(false),
-                        new EmbedFieldBuilder().WithName("ping").WithValue("/ping - Tells you the ping of the bot to discord").WithIsInline(true),
-                        new EmbedFieldBuilder().WithName("info").WithValue("/info - Gives some information about this game").WithIsInline(true),
+/letter view - Shows the first 180 characters of all *Letters* you have set to be sent this *Night*.
+/letter view <number> - Shows the full text of *Letter* number <number>.
+/letter add <recipient> - Opens a box to add a new *Letter* (up to 2000 chars) to PLAYER <recipient>.
+/letter remove <number> - Removes *Letter* number <number>, preventing it from being sent out.
+/letter edit <number> <recipient> - Edits *Letter* number <number> and changes its recipient to <recipient>.").WithIsInline(false),
+                        new EmbedFieldBuilder().WithName("ping").WithValue("/ping - Tells you the ping (response time) of the bot to Discord's servers.").WithIsInline(true),
+                        new EmbedFieldBuilder().WithName("info").WithValue("/info - Gives some information about the ongoing game.").WithIsInline(true),
                     });
 
         await command.RespondAsync(embed: embed.Build());

@@ -12,10 +12,10 @@ public static class Vote
         command.WithName("vote");
         command.WithDescription("Cast or reset your Croak Vote.");
         command.AddOption(new SlashCommandOptionBuilder()
-            .WithName("player")
-            .WithDescription("The PLAYER you want to Croak Vote for.")
-            .WithType(ApplicationCommandOptionType.User)
-            .WithRequired(false)
+            .WithName("cast")
+            .WithDescription("Cast your Croak Vote.")
+            .WithType(ApplicationCommandOptionType.SubCommand)
+            .AddOption("player", ApplicationCommandOptionType.User, "The PLAYER to cast your Vote for.", isRequired: true)
         );
         command.AddOption(new SlashCommandOptionBuilder()
             .WithName("reset")
@@ -48,7 +48,7 @@ public static class Vote
             return;
         }
 
-        if (guild.CurrentPhase != Guild.Phase.Night)
+        if (guild.CurrentPhase != Guild.Phase.Day)
         {
             await command.RespondAsync($"Croak Voting can only be done during the Day!");
             return;
@@ -66,16 +66,16 @@ public static class Vote
             return;
         }
         
-        var option = command.Data.Options.FirstOrDefault();
-        switch (option?.Name)
+        var subcommand = command.Data.Options.FirstOrDefault();
+        switch (subcommand?.Name)
         {
-            case "player":
-                SocketGuildUser? p = command.Data.Options.First().Value as SocketGuildUser;
+            case "cast":
+                SocketGuildUser? p = subcommand.Options.First().Value as SocketGuildUser;
                 Player? croak = guild.Players.Find(x => x != null && x.IsPlayer(p.Id));
 
                 if (croak == null)
                 {
-                    await command.RespondAsync("You can only *Croak Vote* for a PLAYER currently in the game.");
+                    await command.RespondAsync("You can only *Croak Vote* for a PLAYER currently in the game.", ephemeral: true);
                     return;
                 }
 
@@ -84,7 +84,8 @@ public static class Vote
                     guild.Votes[player.CroakVote].Remove(player);
                 }
                 
-                player.CroakVote = command.Data.Options.First().Name;
+                var toCroak = subcommand.Options.First().Value as SocketGuildUser;
+                player.CroakVote = toCroak.Username;
                 if (!guild.Votes.ContainsKey(player.CroakVote))
                 {
                     guild.Votes[player.CroakVote] = new List<Player>() { player };
@@ -94,7 +95,9 @@ public static class Vote
                     guild.Votes[player.CroakVote].Add(player);
                 }
 
+                await command.RespondAsync($"You cast your *Croak Vote* for {player.CroakVote}.");
                 break; 
+            
             
             case "reset":
                 if (player.CroakVote == "")
@@ -104,7 +107,12 @@ public static class Vote
                 }
                 guild.Votes[player.CroakVote].Remove(player);
                 player.CroakVote = "";
+                await command.RespondAsync($"You reset your *Croak Vote*.");
                 break;
+            
+            default:
+                await command.RespondAsync("You must either cast or reset your Vote.", ephemeral: true);
+                return;
         }
     }
 }

@@ -14,7 +14,7 @@ public static class ViewActions
         command.WithName("view_actions");
         command.WithDescription("(Host-Only) Views all current actions.");
         command.AddOption(new SlashCommandOptionBuilder()
-            .WithName("Action Type")
+            .WithName("type")
             .WithDescription("The type of action you want to view.")
             .WithRequired(false)
             .AddChoice("All (Default)", 0)
@@ -194,13 +194,14 @@ public static class ViewActions
                     
                     var croakersList = new List<string>();
                     foreach (Player player in guild.Votes[croakedPlayer]) croakersList.Add(player.Name);
+                    croakersList.Sort();
                     var croakers = string.Join(", ", croakersList);
                     
                     allCroaks.Add(new EmbedFieldBuilder()
-                        .WithName($"**{croakedPlayer} - {guild.Votes[croakedPlayer].Count} Votes**"
+                        .WithName($"{croakedPlayer} - {guild.Votes[croakedPlayer].Count} Votes"
                                   + (guild.Votes[croakedPlayer].Count >=
                                      (Math.Floor((float)guild.Players.Count / 2) + 1)
-                                      ? "*(Past Threshold)*"
+                                      ? " - (Past Threshold)"
                                       : ""))
                         .WithValue($"Voters: {croakers}")
                     );

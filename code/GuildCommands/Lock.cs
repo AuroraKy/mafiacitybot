@@ -14,7 +14,7 @@ public static class Lock
         command.WithDescription("(Host-Only) Toggles the lock on actions and *Letters*.");
         command.AddOption("announce", ApplicationCommandOptionType.Boolean,
                 "Whether to announce the lock toggle in all PLAYER channels.",
-                false, true)
+                true)
             ;        
         try
         {
@@ -62,7 +62,7 @@ public static class Lock
             foreach (Player player in guild.Players)
             { 
                 var playerChannel = await program.client.GetChannelAsync(player.ChannelID) as ITextChannel;
-                await playerChannel.SendMessageAsync("*Actions and Letter commands are now " + (guild.isLocked ? "locked. Hold tight for the Phase transition!" : "unlocked and can be used. Good luck."));
+                await playerChannel.SendMessageAsync("*Actions and Letter commands are now " + (guild.isLocked ? "locked. Hold tight for the Phase transition!*" : "unlocked and can be used. Good luck.*"));
             }
         }
 

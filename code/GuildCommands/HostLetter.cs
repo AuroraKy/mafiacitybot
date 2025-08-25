@@ -12,7 +12,7 @@ namespace mafiacitybot.GuildCommands
         {
             var command = new SlashCommandBuilder();
             command.WithName("host_letter");
-            command.WithDescription("View, add, or remove the HOST *Letter(s)* being sent this *Phase*. Also lets you set PLAYER per-*Phase* *Letter* limits.");
+            command.WithDescription("View, add, or remove the HOST Letters() being sent this *Phase*.");
             command.AddOption(new SlashCommandOptionBuilder()
                 .WithName("add")
                 .WithDescription("Add a letter as the host.")

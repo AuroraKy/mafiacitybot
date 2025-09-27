@@ -34,10 +34,10 @@ public static class Info
             return;
         }
 
-        await command.RespondAsync($"Mafia City Bot by Aurora and Snowy V{Program.VERSION}" +
-            $"\nPhase: {guild.CurrentPhase}" +
-            $"\nPlayer amount: {guild.Players.Count}" +
-            $"\nPlayers: {String.Join(", ", guild.Players.Select(pl => pl.Name + (pl.LinkedNames.Count > 0 ? $" ({String.Join(", ",pl.LinkedNames.Select(x => x.Value))})": "")))}" +
+        await command.RespondAsync($"**Mafia City Bot v{Program.VERSION}**\n#- by Aurora, Gamation, and Snowy" +
+            $"\n*Phase*: {guild.CurrentPhase}" +
+            $"\nPLAYER amount: {guild.Players.Count}" +
+            $"\nPLAYERS: {String.Join(", ", guild.Players.Select(pl => pl.Name + (pl.LinkedNames.Count > 0 ? $" ({String.Join(", ",pl.LinkedNames.Select(x => x.Value))})": "")))}" +
             $"\nActions and *Letters* are currently {(guild.isLocked ? "locked" : "available")}.");
     }
 }

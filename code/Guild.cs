@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Collections.Concurrent;
+using mafiacitybot.GuildCommands;
 
 namespace mafiacitybot;
 
@@ -36,6 +38,8 @@ public class Guild
 
     public List<Letter> hostLetters { get; set; }
     public Dictionary<string, List<Player>> Votes { get; set; }
+    public ConcurrentDictionary<char, AnonChat.AnonChatTunnel> AnonChats { get; set; }
+    public Queue<char> ChatIDs { get; set; }
     public Phase CurrentPhase { get; set; }
 
     public bool isLocked { get; set; } = false;
@@ -48,6 +52,8 @@ public class Guild
         Players = new List<Player>();
         hostLetters = new List<Letter>();
         Votes = new();
+        AnonChats = new();
+        SetupChatIDs();
         isLocked = false;
         CurrentPhase = Phase.Day;
     }
@@ -102,4 +108,17 @@ public class Guild
         return user.Roles.Contains<SocketRole>(Guild.GetRole(roleID));
     }
 
+    public void SetupChatIDs()
+    {
+        List<char> ids = new() { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+        Random rng = new();
+        List<char> shuffledIds = ids.OrderBy(c => rng.Next()).ToList();
+        ChatIDs = new(shuffledIds);
+    }
+
+    public char GetChatID()
+    {
+        if (ChatIDs.Count == 0) SetupChatIDs();
+        return ChatIDs.Dequeue();
+    }
 }

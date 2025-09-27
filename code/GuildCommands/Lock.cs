@@ -59,10 +59,17 @@ public static class Lock
         
         if ((bool)command.Data.Options.First().Value)
         {
+            HashSet<ITextChannel> playerChannels = new();
             foreach (Player player in guild.Players)
-            { 
+            {
                 var playerChannel = await program.client.GetChannelAsync(player.ChannelID) as ITextChannel;
-                await playerChannel.SendMessageAsync("*Actions and Letter commands are now " + (guild.isLocked ? "locked. Hold tight for the Phase transition!*" : "unlocked and can be used. Good luck.*"));
+                if (playerChannel is not null && !playerChannels.Contains(playerChannel)) {
+                    await playerChannel.SendMessageAsync("*Actions and Letter commands are now " + (guild.isLocked
+                                                             ? "locked. Hold tight for the Phase transition!*"
+                                                             : "unlocked and can be used. Good luck.*"));
+                    playerChannels.Add(playerChannel);
+                }
+                
             }
         }
 

@@ -9,7 +9,7 @@ public static class Vote
     public static async Task CreateCommand(DiscordSocketClient client, SocketGuild? guild = null)
     {
         var command = new SlashCommandBuilder();
-        command.WithName("vote");
+        command.WithName("croak");
         command.WithDescription("Cast or reset your Croak Vote.");
         command.AddOption(new SlashCommandOptionBuilder()
             .WithName("cast")

@@ -56,18 +56,18 @@ namespace mafiacitybot.GuildCommands
 
             if(!program.guilds.TryGetValue((ulong)command.GuildId, out Guild guild))
             {
-                await command.RespondAsync($"You must use setup before being able to use this command!");
+                await command.RespondAsync($"You must use /setup before being able to use this command!");
                 return;
             }
 
             if (guild.CurrentPhase != Guild.Phase.Night)
             {
-                await command.RespondAsync($"Letter commands can only be used during the night!");
+                await command.RespondAsync($"*Letter* commands can only be used during the *Night*!");
                 return;
             }
 
             if (guild.isLocked) {
-                await command.RespondAsync($"Letter commands are currently locked, please notify the hosts if you believe this is not intended!");
+                await command.RespondAsync($"*Letter* commands are currently locked. Please notify the HOSTS if you believe this is not intended!");
                 return;
             }
 
@@ -79,7 +79,7 @@ namespace mafiacitybot.GuildCommands
             Player? player = guild.Players.Find(player => player.IsPlayer(user.Id));
             if (player == null || player.ChannelID != channel.Id)
             {
-                await command.RespondAsync("This command can only be used by a player in their channel!");
+                await command.RespondAsync("This command can only be used by a PLAYER in their channel!");
                 return;
             }
 
@@ -89,7 +89,7 @@ namespace mafiacitybot.GuildCommands
 
                     if(player.letters?.Count < 1)
                     {
-                        await command.RespondAsync("You have no letters!");
+                        await command.RespondAsync("You cannot send more *Letters* this *Phase.*");
                     } else
                     {
                         if(options != null && options.Count > 0)
@@ -105,15 +105,14 @@ namespace mafiacitybot.GuildCommands
                         }
                         else
                         {
-                            string response = "";
                             int count = 1;
                             foreach (Player.Letter letter in player.letters)
                             {
-                                response += $"Letter #{count} to {program.client.GetUser(letter.recipientID).Username}:\n`{letter.content.Substring(0, Math.Min(letter.content.Length, 130))}...`\n";
+                                string response = "";
+                                response += $"*Letter* #{count} to {program.client.GetUser(letter.recipientID).Username}:\n`{letter.content.Substring(0, Math.Min(letter.content.Length, 1800))}...`";
+                                await command.RespondAsync(response);
                                 count++;
                             }
-
-                            await command.RespondAsync(response);
                         }
                     }
 
@@ -121,7 +120,7 @@ namespace mafiacitybot.GuildCommands
                 case "add":
 
                     if(player.letters.Count >= player.letterLimit) {
-                        await command.RespondAsync($"You've reached the allowed letter limit of {player.letterLimit}! You may not add any more letters.");
+                        await command.RespondAsync($"You've reached the allowed *Letter* limit of {player.letterLimit}! You may not add any more *Letters*.");
                         return;
                     }
 
@@ -129,7 +128,7 @@ namespace mafiacitybot.GuildCommands
                     Player? recipient = guild.Players.Find(x => x != null && x.IsPlayer(p.Id));
 
                     if (recipient == null) {
-                        await command.RespondAsync("Recipient must be a valid player in this game");
+                        await command.RespondAsync("Recipient must be a valid PLAYER in this game.");
                         return;
                     }
 
@@ -144,19 +143,42 @@ namespace mafiacitybot.GuildCommands
                 case "remove":
                     if (player.letters?.Count < 1)
                     {
-                        await command.RespondAsync("You have no letters!");
+                        await command.RespondAsync("You have no *Letters* to remove.");
                     }
                     else 
                     {
                         long letter = (long)options.First().Value - 1;
+                        SocketGuildUser rec = (SocketGuildUser)options.ElementAt(1).Value;
+                        Player? to = guild.Players.Find(x => x != null && x.IsPlayer(rec.Id));
+                        
+                        if (to == null) {
+                            await command.RespondAsync("Recipient must be a valid PLAYER in this game");
+                            return;
+                        }
+
                         if (letter < 0 || player.letters.Count < letter)
                         {
-                            await command.RespondAsync("Invalid letter number.\nValid letter numbers: " + new Range(0, player.letters.Count - 1));
+                            string response = "Invalid *Letter* number. Valid *Letter(s)*:";
+                            for (int i = 0; i < player.letters.Count; i++)
+                            {
+                                response += $"\n***Letter*** **#{i + 1}, to {to.Name}: " + 
+                                            $"{player.letters[i].content.Substring(0, Math.Min(player.letters[i].content.Length, 130))}";
+                            }
+                            await command.RespondAsync(response);
                         }
                         else
                         {
-                            player.letters.RemoveAt((int)letter);
-                            await command.RespondAsync("Removed letter #" + letter+1);
+                            try
+                            {
+                                player.letters.RemoveAt((int)letter);
+                                await command.RespondAsync("Removed *Letter* #" + (letter + 1));
+                            }
+                            catch (IndexOutOfRangeException)
+                            {
+                                await command.RespondAsync(
+                                    "Hey! If you're seeing this, report it to Gamation, something's bad with letter removing. In the meantime, HOSTS can delete your letter for you. Thanks!");
+                            }
+                            
                         }
                     }
                     break;
@@ -172,14 +194,20 @@ namespace mafiacitybot.GuildCommands
                         Player? to = guild.Players.Find(x => x != null && x.IsPlayer(rec.Id));
 
                         if (to == null) {
-                            await command.RespondAsync("Recipient must be a valid player in this game");
+                            await command.RespondAsync("Recipient must be a valid PLAYER in this game");
                             return;
                         }
 
 
                         if (letter < 0 || player.letters.Count < letter)
                         {
-                            await command.RespondAsync("Invalid letter number.\nValid letter numbers: " + new Range(0, player.letters.Count - 1));
+                            string response = "Invalid *Letter* number. Valid *Letter(s)*:";
+                            for (int i = 0; i < player.letters.Count; i++)
+                            {
+                                response += $"\n***Letter*** **#{i + 1}, to {to.Name}: " + 
+                                            $"{player.letters[i].content.Substring(0, Math.Min(player.letters[i].content.Length, 130))}";
+                            }
+                            await command.RespondAsync(response);
                         }
                         else
                         {
@@ -209,18 +237,18 @@ namespace mafiacitybot.GuildCommands
 
             if (!Program.instance.guilds.TryGetValue((ulong)modal.GuildId, out Guild guild))
             {
-                await modal.RespondAsync($"You must use setup before being able to use this command!");
+                await modal.RespondAsync($"You must use /setup before being able to use this command!");
                 return;
             }
 
             Player? player = guild.Players.Find(player => player != null && player.IsPlayer(user.Id));
             if(player == null) {
-                await modal.RespondAsync("Cannot find player with ID " + user.Id);
+                await modal.RespondAsync("Cannot find PLAYER with ID " + user.Id);
                 return;
             }
             if (!modal.Data.CustomId.StartsWith("host") && (player == null || player.ChannelID != channel.Id))
             {
-                await modal.RespondAsync("This command can only be used by a player in their channel!");
+                await modal.RespondAsync("This command can only be used by a PLAYER in their channel!");
                 return;
             }
 
@@ -243,7 +271,7 @@ namespace mafiacitybot.GuildCommands
                 }
 
                 player.letters.Add(new Player.Letter(recipientId, content));
-                string header = $"Letter added! Letter #{player.letters.Count} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:"; 
+                string header = $"*Letter* added! *Letter* #{player.letters.Count} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:"; 
                 await modal.RespondAsync($"{header}\n`{content.Substring(0, Math.Min(content.Length, 2000-header.Length - 3))}`");
             } else if(modal.Data.CustomId.StartsWith("edit_letter"))
             {
@@ -256,7 +284,7 @@ namespace mafiacitybot.GuildCommands
                 l.content = content;
                 player.letters.RemoveAt((int)letter);
                 player.letters.Insert((int)letter, l);
-                string header = $"Letter changed! Letter #{letter + 1} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:";
+                string header = $"*Letter* changed! *Letter* #{letter + 1} to {Program.instance.client.GetUser(recipientId)?.Username ?? $"<@{recipientId}>"}:";
                 await modal.RespondAsync($"{header}\n`{content.Substring(0, Math.Min(content.Length, 2000 - header.Length - 3))}`");
             }
             guild.Save();

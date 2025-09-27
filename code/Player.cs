@@ -11,6 +11,12 @@ public class Player
     public ulong ChannelID { get; set; }
     public string Name { get; set; }
     public bool Alive { get; set; }
+    
+    // Anon chat features
+    // The dicts are to handle if you're forwarding across multiple chats at once
+    public Dictionary<int, bool> ForwardingStatus { get; set; }
+    public Dictionary<int, string> ForwardingPrefix { get; set; }
+    public bool ForwardingAllowed { get; set; }
 
     public struct Letter
     {

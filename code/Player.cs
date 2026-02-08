@@ -32,6 +32,7 @@ public class Player
     public List<Letter> letters { get; set; }
     public string CroakVote { get; set; }
     public int letterLimit {  get; set; }   
+    public int whisperStock { get; set; }
     public string Action { get; set; }
 
     public Player(ulong playerID, ulong channelID, string name)
@@ -44,6 +45,7 @@ public class Player
         this.LinkedNames = new Dictionary<ulong, string>();
         this.letters = new List<Letter>();
         this.letterLimit = 1;
+        this.whisperStock = 0;
         CroakVote = "";
         Action = "";
 

@@ -33,6 +33,11 @@ public static class AnonChat
             .WithType(ApplicationCommandOptionType.SubCommand)
             .AddOption("id",  ApplicationCommandOptionType.String, "The character ID of the chat to close.", isRequired: true)
         );
+        command.AddOption(new SlashCommandOptionBuilder()
+            .WithName("list")
+            .WithDescription("Get the status of all anonymous chats.")
+            .WithType(ApplicationCommandOptionType.SubCommand)
+        );
 
         try
         {
@@ -85,7 +90,6 @@ public static class AnonChat
                     return;
                 }
                 
-                // TODO: Add support for multiple tunnels by making the ID dynamic
                 char chatid = guild.GetChatID();
                 var tunnel = new AnonChatTunnel(chatid, source.Id, receiver.Id, sourceChannel.Id, receiverChannel.Id);
                 guild.AnonChats[chatid] = tunnel;
@@ -115,6 +119,46 @@ public static class AnonChat
                 }
                 break;
             
+            case "list":
+                if (guild.AnonChats.Count == 0)
+                {
+                    await command.RespondAsync("No active anonymous chats.");
+                }
+                
+                var server = (command.User as SocketGuildUser)?.Guild; 
+                if (server == null)
+                {
+                    await command.RespondAsync("This bot only works inside a server.");
+                    return;
+                }
+                
+                string result = "";
+                foreach (var anontunnel in guild.AnonChats.Values.OrderBy(t => t.Id))
+                {
+                    var sourceUser = server.GetUser(anontunnel.Source);
+                    var receiverUser = server.GetUser(anontunnel.Receiver);
+                    var sourceUserChannel = server.GetTextChannel(anontunnel.SourceChannel);
+                    var receiverUserChannel = server.GetTextChannel(anontunnel.ReceiverChannel);
+
+                    // Forwarding status lookup
+                    bool sourceConfigured = anontunnel.ForwardingAliases.TryGetValue(anontunnel.Source, out var sourceAlias);
+                    anontunnel.ForwardingPrefixes.TryGetValue(anontunnel.Source, out var sourcePrefix);
+                    
+                    bool receiverConfigured = anontunnel.ForwardingAliases.TryGetValue(anontunnel.Receiver, out var receiverAlias);
+                    anontunnel.ForwardingPrefixes.TryGetValue(anontunnel.Receiver, out var receiverPrefix);
+
+                    result += $"Tunnel {anontunnel.Id}";
+                    result += $"\n - Source: {sourceUser.Username} from {sourceUserChannel.Name}";
+                    result += sourceConfigured ? $"\n   Forwarding: Prefix '{sourcePrefix}', Alias '{sourceAlias}'" : "\n   Forwarding: Not configured";
+                    
+                    result += $"\n - Receiver: {receiverUser.Username} from {receiverUserChannel.Name}";
+                    result += receiverConfigured ? $"\n   Forwarding: Prefix '{receiverPrefix}', Alias '{receiverAlias}'" : "\n   Forwarding: Not configured";
+                    result += "\n";
+                }
+                
+                await command.RespondAsync($"```{result}```");
+                break;
+            
             default:
                 await command.RespondAsync("Uh oh.");
                 break;
@@ -131,20 +175,23 @@ public static class AnonChat
         
         foreach (var chatTunnel in guild.AnonChats.Values)
         {
-            if (!chatTunnel.ForwardingUsers.TryGetValue(msg.Author.Id, out var status) || !status) return;
+            // my various safety checks
+            if (!chatTunnel.ForwardingAliases.TryGetValue(msg.Author.Id, out var alias)) continue;
+            if (!chatTunnel.ForwardingPrefixes.TryGetValue(msg.Author.Id, out var prefix)) continue;
+            if (!msg.CleanContent.StartsWith(prefix)) continue;
+            string messageContent = msg.CleanContent.Substring(prefix.Length);
+            if (string.IsNullOrWhiteSpace(messageContent)) continue;
             
             if (msg.Channel.Id == chatTunnel.SourceChannel && msg.Author.Id == chatTunnel.Source)
             {
                 var receiverChannel = (msg.Channel as SocketGuildChannel).Guild.GetTextChannel(chatTunnel.ReceiverChannel);
-                if (!chatTunnel.ForwardingPrefixes.TryGetValue(msg.Author.Id, out var prefix)) prefix = "Source";
-                await receiverChannel.SendMessageAsync($"{prefix}: {msg.CleanContent}");
+                await receiverChannel.SendMessageAsync($"**{alias}**: {messageContent}");
                 return;
             }
             if (msg.Channel.Id == chatTunnel.ReceiverChannel && msg.Author.Id == chatTunnel.Receiver)
             {
                 var sourceChannel = (msg.Channel as SocketGuildChannel).Guild.GetTextChannel(chatTunnel.SourceChannel);
-                if (!chatTunnel.ForwardingPrefixes.TryGetValue(msg.Author.Id, out var prefix)) prefix = "Receiver";
-                await sourceChannel.SendMessageAsync($"{prefix}: {msg.CleanContent}");
+                await sourceChannel.SendMessageAsync($"**{alias}**: {messageContent}");
                 return;
             }
         }
@@ -158,7 +205,7 @@ public static class AnonChat
         public ulong Receiver { get; }
         public ulong SourceChannel { get; }
         public ulong ReceiverChannel { get; }
-        public ConcurrentDictionary<ulong, bool> ForwardingUsers { get; set; } = new();
+        public ConcurrentDictionary<ulong, string> ForwardingAliases { get; set; } = new();
         public ConcurrentDictionary<ulong, string> ForwardingPrefixes { get; set; } = new();
 
         public AnonChatTunnel(char id, ulong source, ulong receiver, ulong sourceChannel, ulong receiverChannel)

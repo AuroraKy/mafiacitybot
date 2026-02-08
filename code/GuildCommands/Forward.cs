@@ -10,10 +10,10 @@ public static class Forward
     {
         var command = new SlashCommandBuilder();
         command.WithName("forward");
-        command.WithDescription("Manage forwarding messages through anon chats.");
-        command.AddOption("status", ApplicationCommandOptionType.Boolean, "Whether to enable or disable forwarding.", isRequired: true);
-        command.AddOption("prefix", ApplicationCommandOptionType.String, "The prefix attached to your forwarded messages.");
-        command.AddOption("id", ApplicationCommandOptionType.String, "The ID of the anonymous chat to manage.");
+        command.WithDescription("Set up your message forwarding.");
+        command.AddOption("alias", ApplicationCommandOptionType.String, "The alias attached to your forwarded messages.", isRequired: true);
+        command.AddOption("prefix", ApplicationCommandOptionType.String, "The prefix to trigger forwarding (e.g., '!' for '!message').", isRequired: true);
+        command.AddOption("id", ApplicationCommandOptionType.String, "The ID of the chat to forward to.");
 
         try
         {
@@ -52,16 +52,14 @@ public static class Forward
             await command.RespondAsync("You are not allowed to enable message forwarding. You are likely not in any anon chats.");
             return;
         } */
-
-        bool status = (bool)command.Data.Options.First(option => option.Name == "status").Value;
         
         char? id = null;
         var userSetId = command.Data.Options.FirstOrDefault(option => option.Name == "id");
         if (userSetId != null) id = ((string)userSetId)[0];
         
-        var userSetPrefix = command.Data.Options.FirstOrDefault(option => option.Name == "prefix");
-        string? prefix = userSetPrefix?.Value?.ToString();
-
+        string alias = (string)command.Data.Options.First(option => option.Name == "alias").Value;
+        string prefix = (string)command.Data.Options.First(option => option.Name == "prefix").Value;
+        
         // i love linq i love linq i love linq im going fucking insane
         var chatTunnels = guild.AnonChats.Values.Where(t => t.Source == user.Id || t.Receiver == user.Id).ToList();
         if (chatTunnels.Count == 0)
@@ -69,10 +67,9 @@ public static class Forward
             await command.RespondAsync("You are not currently in any anonymous chats.");
             return;
         }
-
-        AnonChat.AnonChatTunnel? tunnel = null;
-        // sorry i made the logic flow here kinda bad
+        
         // TODO: make this less garbage
+        AnonChat.AnonChatTunnel? tunnel = null;
         if (id is not null)
         {
             guild.AnonChats.TryGetValue((char)id, out tunnel);
@@ -93,21 +90,12 @@ public static class Forward
             tunnel = chatTunnels.FirstOrDefault(t => t.Source == user.Id || t.Receiver == user.Id);
         }
         
-        tunnel.ForwardingUsers[user.Id] = status;
-        bool resetPrefix = false;
-        if (!string.IsNullOrWhiteSpace(prefix)) tunnel.ForwardingPrefixes[user.Id] = prefix;
-        else
-        {
-            if (tunnel.ForwardingPrefixes.ContainsKey(user.Id))
-            {
-                tunnel.ForwardingPrefixes[user.Id] = "Source";
-                resetPrefix = true;
-            }
-            else resetPrefix = false;
-        }
+        tunnel.ForwardingAliases[user.Id] = alias;
+        tunnel.ForwardingPrefixes[user.Id] = prefix;
 
-        string toSend = $"Forwarding {(status ? "enabled" : "disabled")} for chat with ID `{tunnel.Id}`. ";
-        toSend += ((resetPrefix && !status) ? $"Your messages will be prefixed with \"{prefix}\"." : "");
+        string toSend = $"Deep inside you, you find the courage to speak into the darkness.";
+        toSend += $"\n*Forwarding is set up for tunnel with ID `{tunnel.Id}`. Messages starting with `{prefix}` will be forwarded under the name* **{alias}**.";
+        
         await command.RespondAsync(toSend);
     }
 }

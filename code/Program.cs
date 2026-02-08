@@ -97,6 +97,13 @@ public class Program
             await Vote.CreateCommand(client, guild);
             await AnonChat.CreateCommand(client, guild);
             await Forward.CreateCommand(client, guild);
+            //await Masquerade.CreateCommand(client, guild);
+            //await Mask.CreateCommand(client, guild);
+            //await ConfirmPrefix.CreateCommand(client, guild);
+            await Whisper.CreateCommand(client, guild);
+            await SetWhispers.CreateCommand(client, guild);
+            await ForwardContest.CreateCommand(client, guild);
+            await Contest.CreateCommand(client, guild);
             /* if (guild.Id == 1167188182262095952u)
             {
                 await RegisterCommands.CreateCommand(client, guild);
@@ -119,6 +126,9 @@ public class Program
         client.ModalSubmitted += Actions.ModalSubmitted;
         // lol this fucking sucks
         client.MessageReceived += msg => AnonChat.HandleMessage(msg, guilds);
+        client.MessageReceived += msg => Contest.HandleMessage(msg, guilds);
+        //client.MessageReceived += msg => Masquerade.HandleMessage(msg, guilds, client);
+        client.ModalSubmitted += modal => Whisper.ModalSubmitted(modal, this);
     }
 
     public async Task AddGuild(Guild guild)

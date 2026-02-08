@@ -148,37 +148,24 @@ namespace mafiacitybot.GuildCommands
                     else 
                     {
                         long letter = (long)options.First().Value - 1;
-                        SocketGuildUser rec = (SocketGuildUser)options.ElementAt(1).Value;
-                        Player? to = guild.Players.Find(x => x != null && x.IsPlayer(rec.Id));
                         
-                        if (to == null) {
-                            await command.RespondAsync("Recipient must be a valid PLAYER in this game");
-                            return;
-                        }
 
-                        if (letter < 0 || player.letters.Count < letter)
+                        if (letter < 0 || player.letters.Count <= letter)
                         {
-                            string response = "Invalid *Letter* number. Valid *Letter(s)*:";
+                            string response = "Invalid **Letter** number. Valid **Letter(s)**:";
                             for (int i = 0; i < player.letters.Count; i++)
                             {
-                                response += $"\n***Letter*** **#{i + 1}, to {to.Name}: " + 
-                                            $"{player.letters[i].content.Substring(0, Math.Min(player.letters[i].content.Length, 130))}";
+                                string to = guild.Players.Find(x => x != null && x.IsPlayer(player.letters[i].recipientID)).Name;
+                                response += $"\n- **Letter #{i + 1}, to {to}:** " + 
+                                            $"```{player.letters[i].content.Substring(0, Math.Min(player.letters[i].content.Length, 130))}```";
                             }
                             await command.RespondAsync(response);
                         }
                         else
                         {
-                            try
-                            {
-                                player.letters.RemoveAt((int)letter);
-                                await command.RespondAsync("Removed *Letter* #" + (letter + 1));
-                            }
-                            catch (IndexOutOfRangeException)
-                            {
-                                await command.RespondAsync(
-                                    "Hey! If you're seeing this, report it to Gamation, something's bad with letter removing. In the meantime, HOSTS can delete your letter for you. Thanks!");
-                            }
-                            
+                            string to = guild.Players.Find(x => x != null && x.IsPlayer(player.letters[(int)letter].recipientID)).Name;
+                            player.letters.RemoveAt((int)letter);
+                            await command.RespondAsync("Removed **Letter** #" + (letter + 1) + " to " + to);
                         }
                     }
                     break;

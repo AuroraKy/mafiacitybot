@@ -92,7 +92,7 @@ public class SlashCommandHandler
                 case "lock":
                     _ = Lock.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
-                case "vote":
+                case "croak":
                     _ = Vote.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
                 case "host_anonchat":
@@ -100,6 +100,27 @@ public class SlashCommandHandler
                     break;
                 case "forward":
                     _ = Forward.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "host_masquerade":
+                    _ = Masquerade.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "mask":
+                    _ = Mask.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "confirm_prefix":
+                    _ = ConfirmPrefix.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "whisper":
+                    _ = Whisper.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "host_whisper":
+                    _ = SetWhispers.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "host_contest":
+                    _ = Contest.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
+                    break;
+                case "forward_contest":
+                    _ = ForwardContest.HandleCommand(command, Program).ContinueWith(OnFault, TaskContinuationOptions.OnlyOnFaulted);
                     break;
             }
         }
